@@ -5,7 +5,6 @@ const Home = () => {
   return (
     <Layout>
       <div>Hello from My AI Helper</div>
-
     </Layout>
   );
 };
