@@ -107,6 +107,16 @@ const OrderCreationForm = () => {
     setError(null);
     setMessage(null);
 
+    // Получаем пользователя из localStorage
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    
+    if (!user || !user.id) {
+      setError('Користувач не авторизований. Увійдіть в систему.');
+      setLoading(false);
+      return;
+    }
+
     // Валидация
     const validItems = formData.items.filter(
       (item) => item.productId && item.unitId && item.quantity > 0
@@ -124,6 +134,7 @@ const OrderCreationForm = () => {
         body: JSON.stringify({
           priority: formData.priority,
           notes: formData.notes,
+          userId: user.id,
           products: validItems.map((item) => ({
             productId: item.productId,
             unitId: item.unitId,
