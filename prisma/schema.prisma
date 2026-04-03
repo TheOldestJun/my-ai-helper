@@ -21,6 +21,7 @@ model User {
   firstName  String?
   lastName   String?
   roles      UserRole[]
+  orders     Order[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
@@ -42,4 +43,83 @@ model UserRole {
   createdAt DateTime @default(now())
 
   @@unique([userId, roleId])
+}
+
+model Unit {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  description   String?
+  symbol        String
+  products      ProductUnit[]
+  orderProducts OrderProduct[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  sku           String?        @unique
+  units         ProductUnit[]
+  orderProducts OrderProduct[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ProductUnit {
+  id        String   @id @default(cuid())
+  productId String
+  unitId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([productId, unitId])
+}
+
+model Order {
+  id          String         @id @default(cuid())
+  number      String         @unique
+  status      OrderStatus    @default(PENDING)
+  priority    OrderPriority  @default(NORMAL)
+  notes       String?
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id])
+  products    OrderProduct[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model OrderProduct {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Float
+  unitId    String
+  notes     String?
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unit      Unit     @relation(fields: [unitId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([orderId, productId, unitId])
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ORDERED
+  PAID
+  IN_TRANSIT
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }

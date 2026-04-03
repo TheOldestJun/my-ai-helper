@@ -4,10 +4,9 @@ import { useState } from 'react';
 import UserManagement from './UserManagement';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('users');
 
   const tabs = [
-    { id: 'overview', label: 'Загальне' },
     { id: 'users', label: 'Користувачі' },
     { id: 'settings', label: 'Налаштування' },
     { id: 'logs', label: 'Логи' },
@@ -38,23 +37,6 @@ const AdminDashboard = () => {
 
       {/* Содержимое вкладок */}
       <div className="py-2">
-        {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h3 className="font-semibold text-slate-900 mb-2">Користувачі</h3>
-              <p className="text-sm text-slate-600">Управління користувачами та ролями</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h3 className="font-semibold text-slate-900 mb-2">Налаштування</h3>
-              <p className="text-sm text-slate-600">Системні налаштування</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-              <h3 className="font-semibold text-slate-900 mb-2">Логи</h3>
-              <p className="text-sm text-slate-600">Перегляд системних логів</p>
-            </div>
-          </div>
-        )}
-
         {activeTab === 'users' && (
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <UserManagement />
