@@ -1,11 +1,11 @@
 // app/page.js
-import Layout from '../components/Layout';
+import LoginForm from '../components/LoginForm';
 
 const Home = () => {
   return (
-    <Layout>
-      <div>Hello from My AI Helper</div>
-    </Layout>
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-8">
+      <LoginForm />
+    </div>
   );
 };
 
