@@ -1,11 +1,13 @@
 'use client';
-
 import { useState, useRef, useEffect } from 'react';
 
 const Autocomplete = ({
   options,
   value,
   onChange,
+  onCreate,
+  creatable = false,
+  createLabel = (search) => `Створити "${search}"`,
   placeholder = 'Пошук...',
   labelKey = 'label',
   valueKey = 'id',
@@ -49,8 +51,18 @@ const Autocomplete = ({
     );
   };
 
+  const canCreate = creatable && search && getFilteredOptions().length === 0;
+
   const handleSelect = (option) => {
     onChange(option[valueKey]);
+    setIsOpen(false);
+    setSearch('');
+  };
+
+  const handleCreate = () => {
+    if (onCreate) {
+      onCreate(search.trim());
+    }
     setIsOpen(false);
     setSearch('');
   };
@@ -106,19 +118,30 @@ const Autocomplete = ({
         <div
           className={`absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-auto ${dropdownClassName}`}
         >
-          {getFilteredOptions().length === 0 ? (
+          {getFilteredOptions().length === 0 && !canCreate ? (
             <div className="px-3 py-2 text-sm text-slate-500">{emptyMessage}</div>
           ) : (
-            getFilteredOptions().map((option) => (
-              <button
-                key={option[valueKey]}
-                type="button"
-                onClick={() => handleSelect(option)}
-                className="w-full px-3 py-2 text-left text-sm hover:bg-slate-100 focus:bg-slate-100"
-              >
-                {displayFormat(option)}
-              </button>
-            ))
+            <>
+              {getFilteredOptions().map((option) => (
+                <button
+                  key={option[valueKey]}
+                  type="button"
+                  onClick={() => handleSelect(option)}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-slate-100 focus:bg-slate-100"
+                >
+                  {displayFormat(option)}
+                </button>
+              ))}
+              {canCreate && (
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  className="w-full px-3 py-2 text-left text-sm text-cyan-600 font-medium hover:bg-cyan-50 focus:bg-cyan-50 border-t border-slate-100"
+                >
+                  {createLabel(search)}
+                </button>
+              )}
+            </>
           )}
         </div>
       )}

@@ -69,6 +69,38 @@ const OrderCreationForm = () => {
     }));
   };
 
+  const handleCreateProduct = async (index, productName) => {
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: productName }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setError('Товар з такою назвою вже існує');
+        } else {
+          setError(data.error || 'Помилка при створенні товару');
+        }
+        return;
+      }
+
+      // Добавляем новый товар в список и выбираем его
+      setProducts((prev) => [...prev, data.product]);
+      handleItemChange(index, 'productId', data.product.id);
+      setMessage(`Товар "${data.product.name}" успішно створено`);
+      
+      // Очищаем сообщение через 3 секунды
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error('Помилка створення товару:', err);
+      setError('Помилка з\'єднання при створенні товару');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -180,18 +212,20 @@ const OrderCreationForm = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">Товар</label>
-                  <select
+                  <Autocomplete
+                    options={products}
                     value={item.productId}
-                    onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  >
-                    <option value="">Оберіть товар</option>
-                    {products.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => handleItemChange(index, 'productId', value)}
+                    onCreate={(name) => handleCreateProduct(index, name)}
+                    creatable={true}
+                    createLabel={(search) => `Створити товар "${search}"`}
+                    placeholder="Пошук товару..."
+                    labelKey="name"
+                    valueKey="id"
+                    searchKeys={['name']}
+                    displayFormat={(p) => p.name}
+                    emptyMessage="Нічого не знайдено. Введіть назву для створення."
+                  />
                 </div>
 
                 <div>
