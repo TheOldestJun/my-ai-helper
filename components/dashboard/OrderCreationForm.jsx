@@ -1,6 +1,7 @@
 'use client';
-
 import { useState, useEffect } from 'react';
+
+import Autocomplete from '../Autocomplete';
 
 const priorityOptions = [
   { value: 'LOW', label: 'Низький' },
@@ -208,18 +209,17 @@ const OrderCreationForm = () => {
 
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">Одиниця</label>
-                  <select
+                  <Autocomplete
+                    options={units}
                     value={item.unitId}
-                    onChange={(e) => handleItemChange(index, 'unitId', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  >
-                    <option value="">Оберіть одиницю</option>
-                    {units.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name} ({u.symbol})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => handleItemChange(index, 'unitId', value)}
+                    placeholder="Пошук одиниці..."
+                    labelKey="name"
+                    valueKey="id"
+                    searchKeys={['name', 'symbol']}
+                    displayFormat={(u) => `${u.name} (${u.symbol})`}
+                    emptyMessage="Не знайдено"
+                  />
                 </div>
               </div>
 
