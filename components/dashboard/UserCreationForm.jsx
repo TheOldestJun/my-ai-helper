@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const availableRoles = [
   { name: 'ADMIN', label: 'Адміністратор', description: 'Повний доступ до системи' },
@@ -19,8 +20,6 @@ const UserCreationForm = () => {
     selectedRoles: [],
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,11 +38,9 @@ const UserCreationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setMessage(null);
 
     if (formData.selectedRoles.length === 0) {
-      setError('Оберіть хоча б одну роль');
+      toast.error('Оберіть хоча б одну роль');
       setLoading(false);
       return;
     }
@@ -67,7 +64,7 @@ const UserCreationForm = () => {
         throw new Error(data.error || 'Помилка при створенні користувача');
       }
 
-      setMessage(`Користувача ${data.user.email} успішно створено!`);
+      toast.success(`Користувача ${data.user.email} успішно створено!`);
       setFormData({
         email: '',
         password: '',
@@ -76,7 +73,7 @@ const UserCreationForm = () => {
         selectedRoles: [],
       });
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -85,18 +82,6 @@ const UserCreationForm = () => {
   return (
     <div className="max-w-2xl">
       <h3 className="text-lg font-semibold text-slate-900 mb-4">Створення нового користувача</h3>
-
-      {message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-700 text-sm">{message}</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

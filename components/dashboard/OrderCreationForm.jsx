@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import Autocomplete from '../Autocomplete';
 
@@ -14,8 +15,6 @@ const OrderCreationForm = () => {
   const [products, setProducts] = useState([]);
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     priority: 'NORMAL',
@@ -81,48 +80,43 @@ const OrderCreationForm = () => {
 
       if (!response.ok) {
         if (response.status === 409) {
-          setError('Товар з такою назвою вже існує');
+          toast.error('Товар з такою назвою вже існує');
         } else {
-          setError(data.error || 'Помилка при створенні товару');
+        toast.error(data.error || 'Помилка при створенні товару');
         }
         return;
       }
 
-      // Добавляем новый товар в список и выбираем его
+      // Добавляємо новий товар в список і вибираємо його
       setProducts((prev) => [...prev, data.product]);
       handleItemChange(index, 'productId', data.product.id);
-      setMessage(`Товар "${data.product.name}" успішно створено`);
-      
-      // Очищаем сообщение через 3 секунды
-      setTimeout(() => setMessage(null), 3000);
+      toast.success(`Товар "${data.product.name}" успішно створено`);
     } catch (err) {
       console.error('Помилка створення товару:', err);
-      setError('Помилка з\'єднання при створенні товару');
+      toast.error('Помилка з\'єднання при створенні товару');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setMessage(null);
 
-    // Получаем пользователя из localStorage
+    // Отримуємо користувача з localStorage
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
     
     if (!user || !user.id) {
-      setError('Користувач не авторизований. Увійдіть в систему.');
+      toast.error('Користувач не авторизований. Увійдіть в систему.');
       setLoading(false);
       return;
     }
 
-    // Валидация
+    // Валідація
     const validItems = formData.items.filter(
       (item) => item.productId && item.unitId && item.quantity > 0
     );
     if (validItems.length === 0) {
-      setError('Додайте хоча б один товар з кількістю');
+      toast.error('Додайте хоча б один товар з кількістю');
       setLoading(false);
       return;
     }
@@ -150,14 +144,14 @@ const OrderCreationForm = () => {
         throw new Error(data.error || 'Помилка при створенні замовлення');
       }
 
-      setMessage(`Замовлення №${data.order.number} успішно створено!`);
+      toast.success(`Замовлення №${data.order.number} успішно створено!`);
       setFormData({
         priority: 'NORMAL',
         notes: '',
         items: [{ productId: '', unitId: '', quantity: '', notes: '' }],
       });
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -166,18 +160,6 @@ const OrderCreationForm = () => {
   return (
     <div className="max-w-3xl">
       <h3 className="text-lg font-semibold text-slate-900 mb-4">Нове замовлення</h3>
-
-      {message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-700 text-sm">{message}</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -197,10 +179,10 @@ const OrderCreationForm = () => {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Примітки</label>
-          <textarea
+          <input
+            type="text"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            rows={3}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
             placeholder="Додаткова інформація про замовлення..."
           />
@@ -220,8 +202,8 @@ const OrderCreationForm = () => {
 
           {formData.items.map((item, index) => (
             <div key={index} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="sm:col-span-2">
                   <label className="block text-xs text-slate-500 mb-1">Товар</label>
                   <Autocomplete
                     options={products}

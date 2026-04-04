@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 
 const statusLabels = {
   PENDING: 'Очікує',
@@ -41,7 +42,6 @@ const priorityColors = {
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -51,7 +51,7 @@ const OrderList = () => {
       const data = await response.json();
       setOrders(data.orders);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -65,14 +65,6 @@ const OrderList = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-700 text-sm">{error}</p>
       </div>
     );
   }
@@ -92,9 +84,6 @@ const OrderList = () => {
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-3">
               <span className="font-semibold text-slate-900">№ {order.number}</span>
-              <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[order.status]}`}>
-                {statusLabels[order.status]}
-              </span>
               <span className={`px-2 py-1 text-xs font-medium rounded ${priorityColors[order.priority]}`}>
                 {priorityLabels[order.priority]}
               </span>
@@ -111,12 +100,17 @@ const OrderList = () => {
           {order.products && order.products.length > 0 && (
             <div className="border-t border-slate-100 pt-3">
               <p className="text-xs font-medium text-slate-500 mb-2">Товари:</p>
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {order.products.map((item) => (
-                  <li key={item.id} className="text-sm text-slate-700 flex items-center gap-2">
-                    <span className="font-medium">{item.product.name}</span>
-                    <span className="text-slate-400">·</span>
-                    <span>{item.quantity} {item.unit.symbol}</span>
+                  <li key={item.id} className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-700">{item.product.name}</span>
+                      <span className="text-slate-400">·</span>
+                      <span className="text-slate-600">{item.quantity} {item.unit.symbol}</span>
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]}`}>
+                      {statusLabels[item.status]}
+                    </span>
                   </li>
                 ))}
               </ul>

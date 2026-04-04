@@ -55,27 +55,30 @@ export async function POST(request) {
       );
     }
 
-    // Проверяем, существует ли товар с таким названием (case-insensitive для MySQL)
+    // Нормалізуємо назву до верхнього регістру
+    const normalizedName = name.trim().toUpperCase();
+
+    // Перевіряємо, чи існує товар з такою назвою
     const existingProduct = await prisma.product.findFirst({
       where: {
         name: {
-          contains: name.trim(),
+          contains: normalizedName,
         },
       },
     });
 
-    // Дополнительная проверка на точное совпадение без учета регистра
-    if (existingProduct && existingProduct.name.toLowerCase() === name.trim().toLowerCase()) {
+    // Додаткова перевірка на точний збіг
+    if (existingProduct && existingProduct.name.toUpperCase() === normalizedName) {
       return NextResponse.json(
         { error: 'Товар з такою назвою вже існує' },
         { status: 409 }
       );
     }
 
-    // Создаем новый товар
+    // Створюємо новий товар
     const product = await prisma.product.create({
       data: {
-        name: name.trim(),
+        name: normalizedName,
         description: description?.trim() || null,
       },
       select: {

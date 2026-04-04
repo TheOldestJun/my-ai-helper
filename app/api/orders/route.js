@@ -14,7 +14,6 @@ export async function GET(request) {
       select: {
         id: true,
         number: true,
-        status: true,
         priority: true,
         notes: true,
         createdAt: true,
@@ -22,6 +21,7 @@ export async function GET(request) {
           select: {
             id: true,
             quantity: true,
+            status: true,
             notes: true,
             product: {
               select: {
@@ -112,7 +112,6 @@ export async function POST(request) {
       select: {
         id: true,
         number: true,
-        status: true,
         priority: true,
         notes: true,
         createdAt: true,
@@ -120,6 +119,7 @@ export async function POST(request) {
           select: {
             id: true,
             quantity: true,
+            status: true,
             notes: true,
             product: {
               select: {

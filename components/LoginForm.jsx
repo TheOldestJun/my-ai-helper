@@ -1,17 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
 
     try {
@@ -26,18 +25,18 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Помилка входу');
+        toast.error(data.error || 'Помилка входу');
         setIsLoading(false);
         return;
       }
 
-      // Сохраняем пользователя в localStorage
+      // Зберігаємо користувача в localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Редирект на дашборд
       window.location.href = '/dashboard';
     } catch (err) {
-      setError('Помилка з\'єднання з сервером');
+      toast.error('Помилка з\'єднання з сервером');
       setIsLoading(false);
     }
   };
@@ -50,13 +49,6 @@ const LoginForm = () => {
           <h2 className="text-2xl font-bold text-slate-900">Вхід до системи</h2>
           <p className="text-slate-600 mt-2">Введіть свої дані для продовження</p>
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-            {error}
-          </div>
-        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">

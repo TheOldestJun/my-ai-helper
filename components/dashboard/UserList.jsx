@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 
 const availableRoles = [
   { name: 'ADMIN', label: 'Адміністратор' },
@@ -21,10 +22,8 @@ const roleColors = {
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [message, setMessage] = useState(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -34,7 +33,7 @@ const UserList = () => {
       const data = await response.json();
       setUsers(data.users);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -50,12 +49,11 @@ const UserList = () => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete user');
-      setMessage('Користувача успішно видалено');
+      toast.success('Користувача успішно видалено');
       setDeleteConfirm(null);
       fetchUsers();
-      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -74,12 +72,11 @@ const UserList = () => {
         }),
       });
       if (!response.ok) throw new Error('Failed to update user');
-      setMessage('Користувача успішно оновлено');
+      toast.success('Користувача успішно оновлено');
       setEditingUser(null);
       fetchUsers();
-      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -110,17 +107,6 @@ const UserList = () => {
 
   return (
     <div className="space-y-4">
-      {message && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-700 text-sm">{message}</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
-        </div>
-      )}
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
