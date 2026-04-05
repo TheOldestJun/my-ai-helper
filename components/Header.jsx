@@ -11,7 +11,6 @@ const Header = () => {
 
   const navLinks = [
     { href: '#', label: 'Допомога' },
-    { href: '#', label: 'Вихід' },
   ];
 
   return (

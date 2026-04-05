@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-import Autocomplete from '../Autocomplete';
+import Autocomplete from '@/components/Autocomplete';
 
 const priorityOptions = [
   { value: 'LOW', label: 'Низький' },

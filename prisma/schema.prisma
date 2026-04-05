@@ -106,6 +106,12 @@ model OrderProduct {
   @@unique([orderId, productId, unitId])
 }
 
+model Dish {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
 enum OrderStatus {
   PENDING
   APPROVED

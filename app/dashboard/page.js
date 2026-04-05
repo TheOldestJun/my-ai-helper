@@ -7,7 +7,7 @@ import {
   ApplicantDashboard,
   KitchenDashboard,
   WarehouseDashboard,
-} from '../../components/dashboard';
+} from '@/components/dashboard';
 
 const roleDashboards = {
   ADMIN: AdminDashboard,
