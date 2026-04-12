@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -240,7 +239,7 @@ const MenuPlanner = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -248,17 +247,17 @@ const MenuPlanner = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-slate-900">Меню на тиждень</h3>
+        <h3 className="text-lg font-semibold text-foreground">Меню на тиждень</h3>
         <div className="flex gap-2">
           <button
             onClick={handleExportPDF}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/20 transition-colors"
           >
             Експорт в PDF
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
           >
             Зберегти
           </button>
@@ -266,8 +265,8 @@ const MenuPlanner = () => {
       </div>
 
       {/* Вибір робочих днів через чекбокси */}
-      <div className="bg-slate-50 p-4 rounded-lg">
-        <p className="text-sm font-medium text-slate-700 mb-3">Виберіть робочі дні:</p>
+      <div className="bg-muted p-4 rounded-lg">
+        <p className="text-sm font-medium text-foreground mb-3">Виберіть робочі дні:</p>
         <div className="flex flex-wrap gap-4">
           {daysOfWeek.map((day) => (
             <label key={day.id} className="flex items-center gap-2 cursor-pointer">
@@ -275,9 +274,9 @@ const MenuPlanner = () => {
                 type="checkbox"
                 checked={selectedDays.includes(day.id)}
                 onChange={() => toggleDay(day.id)}
-                className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
+                className="w-4 h-4 text-primary rounded focus:ring-ring"
               />
-              <span className="text-sm text-slate-700">{day.label}</span>
+              <span className="text-sm text-foreground">{day.label}</span>
             </label>
           ))}
         </div>
@@ -288,13 +287,13 @@ const MenuPlanner = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              <th className="px-2 py-3 text-left text-xs font-medium text-slate-500 uppercase bg-slate-50 border border-slate-200 w-24">
+              <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground uppercase bg-muted border border-border w-24">
                 Прийом їжі
               </th>
               {visibleDays.map((day) => (
                 <th
                   key={day.id}
-                  className="px-2 py-3 text-center text-sm font-semibold text-slate-700 bg-slate-50 border border-slate-200"
+                  className="px-2 py-3 text-center text-sm font-semibold text-foreground bg-muted border border-border"
                 >
                   {day.label}
                 </th>
@@ -304,13 +303,13 @@ const MenuPlanner = () => {
           <tbody>
             {mealTypes.map((meal) => (
               <tr key={meal.id}>
-                <td className="px-2 py-4 text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 align-top">
+                <td className="px-2 py-4 text-sm font-medium text-foreground bg-muted border border-border align-top">
                   {meal.label}
                 </td>
                 {visibleDays.map((day) => (
                   <td
                     key={`${day.id}-${meal.id}`}
-                    className="px-2 py-2 border border-slate-200 align-top min-w-[180px]"
+                    className="px-2 py-2 border border-border align-top min-w-[180px]"
                   >
                     <div className="space-y-2">
                       {/* Список страв */}
@@ -318,12 +317,12 @@ const MenuPlanner = () => {
                         {(menu[day.id]?.[meal.id] || []).map((dishId) => (
                           <li
                             key={dishId}
-                            className="flex items-center justify-between bg-cyan-50 px-2 py-1 rounded text-sm"
+                            className="flex items-center justify-between bg-primary/10 px-2 py-1 rounded text-sm"
                           >
-                            <span className="text-slate-700 truncate">{getDishName(dishId)}</span>
+                            <span className="text-foreground truncate">{getDishName(dishId)}</span>
                             <button
                               onClick={() => handleRemoveDish(day.id, meal.id, dishId)}
-                              className="text-red-500 hover:text-red-700 text-xs ml-1 flex-shrink-0"
+                              className="text-destructive hover:text-destructive/80 text-xs ml-1 flex-shrink-0"
                             >
                               ×
                             </button>

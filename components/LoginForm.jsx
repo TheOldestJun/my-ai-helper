@@ -42,18 +42,18 @@ const LoginForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+      <div className="bg-card text-card-foreground rounded-2xl shadow-lg border border-border p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-900">Вхід до системи</h2>
-          <p className="text-slate-600 mt-2">Введіть свої дані для продовження</p>
+          <h2 className="text-2xl font-bold text-foreground">Вхід до системи</h2>
+          <p className="text-muted-foreground mt-2">Введіть свої дані для продовження</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
               Email
             </label>
             <div className="relative">
@@ -69,19 +69,19 @@ const LoginForm = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="your@email.com"
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors text-slate-900 placeholder-slate-400"
+                className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder-muted-foreground"
               />
             </div>
           </div>
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
               Пароль
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -92,12 +92,12 @@ const LoginForm = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors text-slate-900 placeholder-slate-400"
+                className="w-full pl-10 pr-12 py-3 border border-input bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder-muted-foreground"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
                 aria-label={showPassword ? 'Сховати пароль' : 'Показати пароль'}
               >
                 {showPassword ? (
@@ -119,11 +119,11 @@ const LoginForm = () => {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                className="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"
+                className="w-4 h-4 text-primary border-border rounded focus:ring-ring"
               />
-              <span className="ml-2 text-slate-600">Запам'ятати мене</span>
+              <span className="ml-2 text-muted-foreground">Запам'ятати мене</span>
             </label>
-            <a href="#" className="text-cyan-600 hover:text-cyan-700 font-medium transition-colors">
+            <a href="#" className="text-primary hover:text-primary/80 font-medium transition-colors">
               Забули пароль?
             </a>
           </div>

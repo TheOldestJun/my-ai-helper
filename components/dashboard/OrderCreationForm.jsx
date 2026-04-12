@@ -159,15 +159,15 @@ const OrderCreationForm = () => {
 
   return (
     <div className="max-w-3xl">
-      <h3 className="text-lg font-semibold text-slate-900 mb-4">Нове замовлення</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">Нове замовлення</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Пріоритет</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Пріоритет</label>
           <select
             value={formData.priority}
             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
           >
             {priorityOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -178,33 +178,33 @@ const OrderCreationForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Примітки</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Примітки</label>
           <input
             type="text"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
             placeholder="Додаткова інформація про замовлення..."
           />
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-slate-700">Товари</label>
+            <label className="block text-sm font-medium text-foreground">Товари</label>
             <button
               type="button"
               onClick={handleAddItem}
-              className="text-sm text-cyan-600 hover:text-cyan-700 font-medium"
+              className="text-sm text-primary hover:text-primary/80 font-medium"
             >
               + Додати товар
             </button>
           </div>
 
           {formData.items.map((item, index) => (
-            <div key={index} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+            <div key={index} className="p-3 bg-muted rounded-lg border border-border space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs text-slate-500 mb-1">Товар</label>
+                  <label className="block text-xs text-muted-foreground mb-1">Товар</label>
                   <Autocomplete
                     options={products}
                     value={item.productId}
@@ -222,51 +222,55 @@ const OrderCreationForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Кількість</label>
+                  <label className="block text-xs text-muted-foreground mb-1">Кількість</label>
                   <input
                     type="number"
                     min="0.01"
                     step="0.01"
                     value={item.quantity}
                     onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                     placeholder="0.00"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Одиниця</label>
+                  <label className="block text-xs text-muted-foreground mb-1">Одиниця</label>
                   <Autocomplete
                     options={units}
                     value={item.unitId}
                     onChange={(value) => handleItemChange(index, 'unitId', value)}
-                    placeholder="Пошук одиниці..."
-                    labelKey="name"
+                    creatable={true}
+                    createLabel={(search) => `Створити одиницю "${search}"`}
+                    placeholder="Одиниця..."
+                    labelKey="symbol"
                     valueKey="id"
-                    searchKeys={['name', 'symbol']}
                     displayFormat={(u) => `${u.name} (${u.symbol})`}
-                    emptyMessage="Не знайдено"
+                    emptyMessage="Нічого не знайдено"
                   />
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={item.notes}
-                  onChange={(e) => handleItemChange(index, 'notes', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="Примітки до товару..."
-                />
-                {formData.items.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveItem(index)}
-                    className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    Видалити
-                  </button>
-                )}
+                <div className="sm:col-span-1 flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="block text-xs text-muted-foreground mb-1">Примітки</label>
+                    <input
+                      type="text"
+                      value={item.notes}
+                      onChange={(e) => handleItemChange(index, 'notes', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
+                      placeholder="Примітки..."
+                    />
+                  </div>
+                  {formData.items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(index)}
+                      className="px-3 py-2 text-destructive hover:text-destructive/80 text-sm"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -275,7 +279,7 @@ const OrderCreationForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full py-2.5 px-4 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Створення...' : 'Створити замовлення'}
         </button>

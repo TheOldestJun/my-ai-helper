@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 
@@ -12,11 +11,11 @@ const availableRoles = [
 ];
 
 const roleColors = {
-  ADMIN: 'bg-purple-100 text-purple-700',
-  SUPPLY: 'bg-blue-100 text-blue-700',
-  APPLICANT: 'bg-green-100 text-green-700',
-  KITCHEN: 'bg-orange-100 text-orange-700',
-  WAREHOUSE: 'bg-amber-100 text-amber-700',
+  ADMIN: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300',
+  SUPPLY: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+  APPLICANT: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
+  KITCHEN: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+  WAREHOUSE: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
 };
 
 const UserList = () => {
@@ -100,7 +99,7 @@ const UserList = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -110,7 +109,7 @@ const UserList = () => {
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+          <thead className="text-xs text-muted-foreground uppercase bg-muted">
             <tr>
               <th className="px-4 py-3">Користувач</th>
               <th className="px-4 py-3">Email</th>
@@ -119,20 +118,20 @@ const UserList = () => {
               <th className="px-4 py-3 text-right">Дії</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-border">
             {users.map((user) => (
-              <tr key={user.id} className="bg-white hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-900">
+              <tr key={user.id} className="bg-card hover:bg-muted/50">
+                <td className="px-4 py-3 font-medium text-foreground">
                   {user.firstName} {user.lastName}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{user.email}</td>
+                <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-1">
                     {user.roles.map((role) => (
                       <span
                         key={role.name}
                         className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-                          roleColors[role.name] || 'bg-slate-100 text-slate-700'
+                          roleColors[role.name] || 'bg-muted text-muted-foreground'
                         }`}
                       >
                         {availableRoles.find((r) => r.name === role.name)?.label || role.name}
@@ -140,19 +139,19 @@ const UserList = () => {
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-slate-500">
+                <td className="px-4 py-3 text-muted-foreground">
                   {new Date(user.createdAt).toLocaleDateString('uk-UA')}
                 </td>
                 <td className="px-4 py-3 text-right space-x-2">
                   <button
                     onClick={() => openEditModal(user)}
-                    className="px-3 py-1 text-xs font-medium text-cyan-700 bg-cyan-50 rounded hover:bg-cyan-100 transition-colors"
+                    className="px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
                   >
                     Редагувати
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(user)}
-                    className="px-3 py-1 text-xs font-medium text-red-700 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                    className="px-3 py-1 text-xs font-medium text-destructive bg-destructive/10 rounded hover:bg-destructive/20 transition-colors"
                   >
                     Видалити
                   </button>
@@ -166,53 +165,53 @@ const UserList = () => {
       {/* Edit Modal */}
       {editingUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto border border-border">
             <div className="p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Редагування користувача</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Редагування користувача</h3>
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Ім&apos;я</label>
+                    <label className="block text-xs font-medium text-foreground mb-1">Ім&apos;я</label>
                     <input
                       type="text"
                       value={editingUser.firstName || ''}
                       onChange={(e) => setEditingUser({ ...editingUser, firstName: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Прізвище</label>
+                    <label className="block text-xs font-medium text-foreground mb-1">Прізвище</label>
                     <input
                       type="text"
                       value={editingUser.lastName || ''}
                       onChange={(e) => setEditingUser({ ...editingUser, lastName: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Email</label>
+                  <label className="block text-xs font-medium text-foreground mb-1">Email</label>
                   <input
                     type="email"
                     value={editingUser.email}
                     onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Новий пароль (необов&apos;язково)</label>
+                  <label className="block text-xs font-medium text-foreground mb-1">Новий пароль (необов&apos;язково)</label>
                   <input
                     type="password"
                     value={editingUser.newPassword}
                     onChange={(e) => setEditingUser({ ...editingUser, newPassword: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                     placeholder="Мінімум 6 символів"
                     minLength={6}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-2">Ролі</label>
+                  <label className="block text-xs font-medium text-foreground mb-2">Ролі</label>
                   <div className="space-y-1">
                     {availableRoles.map((role) => (
                       <label key={role.name} className="flex items-center gap-2">
@@ -222,7 +221,7 @@ const UserList = () => {
                           onChange={() => toggleRole(role.name)}
                           className="h-4 w-4 text-cyan-600 rounded"
                         />
-                        <span className="text-sm text-slate-700">{role.label}</span>
+                        <span className="text-sm text-foreground">{role.label}</span>
                       </label>
                     ))}
                   </div>
@@ -231,13 +230,13 @@ const UserList = () => {
                   <button
                     type="button"
                     onClick={() => setEditingUser(null)}
-                    className="flex-1 py-2 px-4 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                    className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
                   >
                     Скасувати
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2 px-4 text-sm font-medium text-white bg-cyan-600 rounded-lg hover:bg-cyan-700"
+                    className="flex-1 py-2 px-4 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90"
                   >
                     Зберегти
                   </button>
@@ -251,22 +250,22 @@ const UserList = () => {
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-sm w-full p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Підтвердження видалення</h3>
-            <p className="text-sm text-slate-600 mb-4">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-sm w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Підтвердження видалення</h3>
+            <p className="text-sm text-muted-foreground mb-4">
               Ви впевнені, що хочете видалити користувача <strong>{deleteConfirm.email}</strong>?
               Цю дію неможливо скасувати.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2 px-4 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
               >
                 Скасувати
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
-                className="flex-1 py-2 px-4 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+                className="flex-1 py-2 px-4 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90"
               >
                 Видалити
               </button>

@@ -14,10 +14,10 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Адміністративна панель</h2>
+      <h2 className="text-2xl font-bold text-foreground">Адміністративна панель</h2>
 
       {/* Вкладки */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-border">
         <nav className="flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -25,8 +25,8 @@ const AdminDashboard = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-cyan-600 text-cyan-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               {tab.label}
@@ -38,20 +38,20 @@ const AdminDashboard = () => {
       {/* Содержимое вкладок */}
       <div className="py-2">
         {activeTab === 'users' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <UserManagement />
           </div>
         )}
 
         {activeTab === 'settings' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <p className="text-slate-600">Налаштування системи</p>
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <p className="text-muted-foreground">Налаштування системи</p>
           </div>
         )}
 
         {activeTab === 'logs' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <p className="text-slate-600">Системні логи</p>
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <p className="text-muted-foreground">Системні логи</p>
           </div>
         )}
       </div>

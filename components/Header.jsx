@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ThemeToggle } from './ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,9 +42,11 @@ const Header = () => {
             </ul>
           </nav>
 
-          {/* Burger Button */}
-          <button
-            onClick={toggleMenu}
+          {/* Theme Toggle & Burger Button */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              onClick={toggleMenu}
             className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
             aria-label={isMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
             aria-expanded={isMenuOpen}
@@ -72,6 +75,7 @@ const Header = () => {
               )}
             </svg>
           </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}

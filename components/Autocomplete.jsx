@@ -91,12 +91,12 @@ const Autocomplete = ({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={value ? '' : placeholder}
-          className={`w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 ${inputClassName}`}
+          className={`w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground ${inputClassName}`}
         />
         <button
           type="button"
           onClick={toggleDropdown}
-          className="absolute inset-y-0 right-0 px-2 text-slate-400 hover:text-slate-600"
+          className="absolute inset-y-0 right-0 px-2 text-muted-foreground hover:text-foreground"
         >
           <svg
             className="w-4 h-4"
@@ -116,10 +116,10 @@ const Autocomplete = ({
 
       {isOpen && (
         <div
-          className={`absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-auto ${dropdownClassName}`}
+          className={`absolute z-10 w-full mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg max-h-48 overflow-auto ${dropdownClassName}`}
         >
           {getFilteredOptions().length === 0 && !canCreate ? (
-            <div className="px-3 py-2 text-sm text-slate-500">{emptyMessage}</div>
+            <div className="px-3 py-2 text-sm text-muted-foreground">{emptyMessage}</div>
           ) : (
             <>
               {getFilteredOptions().map((option) => (
@@ -127,7 +127,7 @@ const Autocomplete = ({
                   key={option[valueKey]}
                   type="button"
                   onClick={() => handleSelect(option)}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-slate-100 focus:bg-slate-100"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted focus:bg-muted"
                 >
                   {displayFormat(option)}
                 </button>
@@ -136,7 +136,7 @@ const Autocomplete = ({
                 <button
                   type="button"
                   onClick={handleCreate}
-                  className="w-full px-3 py-2 text-left text-sm text-cyan-600 font-medium hover:bg-cyan-50 focus:bg-cyan-50 border-t border-slate-100"
+                  className="w-full px-3 py-2 text-left text-sm text-primary font-medium hover:bg-primary/10 focus:bg-primary/10 border-t border-border"
                 >
                   {createLabel(search)}
                 </button>

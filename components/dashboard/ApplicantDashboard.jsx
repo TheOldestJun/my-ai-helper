@@ -14,10 +14,10 @@ const ApplicantDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Подання заявок</h2>
+      <h2 className="text-2xl font-bold text-foreground">Подання заявок</h2>
 
       {/* Вкладки */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-border">
         <nav className="flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -25,8 +25,8 @@ const ApplicantDashboard = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-cyan-600 text-cyan-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               {tab.label}
@@ -38,13 +38,13 @@ const ApplicantDashboard = () => {
       {/* Содержимое вкладок */}
       <div className="py-2">
         {activeTab === 'orders' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <OrderList />
           </div>
         )}
 
         {activeTab === 'new' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <OrderCreationForm />
           </div>
         )}

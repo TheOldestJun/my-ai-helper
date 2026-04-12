@@ -26,11 +26,11 @@ const roleLabels = {
 };
 
 const roleColors = {
-  ADMIN: 'bg-purple-100 text-purple-700 border-purple-200',
-  SUPPLY: 'bg-blue-100 text-blue-700 border-blue-200',
-  APPLICANT: 'bg-green-100 text-green-700 border-green-200',
-  KITCHEN: 'bg-orange-100 text-orange-700 border-orange-200',
-  WAREHOUSE: 'bg-amber-100 text-amber-700 border-amber-200',
+  ADMIN: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+  SUPPLY: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+  APPLICANT: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+  KITCHEN: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+  WAREHOUSE: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
 };
 
 export default function Dashboard() {
@@ -67,8 +67,8 @@ export default function Dashboard() {
     return (
       <div className="min-h-[calc(100vh-200px)] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">Доступ заборонено</h2>
-          <p className="text-slate-600 mb-4">Будь ласка, увійдіть в систему</p>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Доступ заборонено</h2>
+          <p className="text-muted-foreground mb-4">Будь ласка, увійдіть в систему</p>
           <a href="/" className="inline-block px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
             На сторінку входу
           </a>
@@ -81,13 +81,13 @@ export default function Dashboard() {
 
   return (
     <div className="py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Вітаємо, {user.firstName} {user.lastName}</h1>
-              <p className="text-slate-600 mt-1">{user.email}</p>
+              <h1 className="text-2xl font-bold text-foreground">Вітаємо, {user.firstName} {user.lastName}</h1>
+              <p className="text-muted-foreground mt-1">{user.email}</p>
             </div>
-            <button onClick={handleLogout} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium">Вийти</button>
+            <button onClick={handleLogout} className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors text-sm font-medium">Вийти</button>
           </div>
         </div>
 
@@ -95,7 +95,7 @@ export default function Dashboard() {
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {user.roles.map((role) => (
-                <button key={role.name} onClick={() => setActiveRole(role.name)} className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border ${activeRole === role.name ? roleColors[role.name] : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+                <button key={role.name} onClick={() => setActiveRole(role.name)} className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border ${activeRole === role.name ? roleColors[role.name] : 'bg-card text-muted-foreground border-border hover:bg-muted'}`}>
                   {roleLabels[role.name] || role.name}
                 </button>
               ))}
