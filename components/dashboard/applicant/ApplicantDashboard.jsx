@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import OrderList from './OrderList';
-import OrderCreationForm from './OrderCreationForm';
+import OrderList from '../shared/OrderList';
+import OrderCreationForm from '../shared/OrderCreationForm';
 
 const ApplicantDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
