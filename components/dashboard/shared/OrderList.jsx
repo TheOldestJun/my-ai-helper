@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import OrderItemEditForm from './OrderItemEditForm';
 
 const statusLabels = {
   PENDING: 'Очікує',
@@ -39,9 +40,12 @@ const priorityColors = {
   URGENT: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
 };
 
-const OrderList = () => {
+const OrderList = ({ showActions = false, allowEdit = false }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rejectModal, setRejectModal] = useState({ open: false, orderId: null, reason: '' });
+  const [editModal, setEditModal] = useState({ open: false, item: null, orderId: null });
+  const [cancelModal, setCancelModal] = useState({ open: false, itemId: null, orderId: null });
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -60,6 +64,118 @@ const OrderList = () => {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  const handleApprove = async (orderId) => {
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!user || !user.id) {
+      toast.error('Користувач не авторизований');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'approve',
+          userId: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка при погодженні заявки');
+      }
+
+      toast.success('Заявку успішно погоджено');
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleReject = async () => {
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!user || !user.id) {
+      toast.error('Користувач не авторизований');
+      return;
+    }
+
+    if (!rejectModal.reason.trim()) {
+      toast.error('Вкажіть причину відмови');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/orders/${rejectModal.orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reject',
+          userId: user.id,
+          rejectionReason: rejectModal.reason,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка при відхиленні заявки');
+      }
+
+      toast.success('Заявку відхилено');
+      setRejectModal({ open: false, orderId: null, reason: '' });
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const openRejectModal = (orderId) => {
+    setRejectModal({ open: true, orderId, reason: '' });
+  };
+
+  const closeRejectModal = () => {
+    setRejectModal({ open: false, orderId: null, reason: '' });
+  };
+
+  const openEditModal = (item, orderId) => {
+    setEditModal({ open: true, item, orderId });
+  };
+
+  const closeEditModal = () => {
+    setEditModal({ open: false, item: null, orderId: null });
+  };
+
+  const openCancelModal = (itemId, orderId) => {
+    setCancelModal({ open: true, itemId, orderId });
+  };
+
+  const closeCancelModal = () => {
+    setCancelModal({ open: false, itemId: null, orderId: null });
+  };
+
+  const handleCancel = async () => {
+    try {
+      const response = await fetch(`/api/orders/${cancelModal.orderId}/products/${cancelModal.itemId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка при скасуванні пункту заявки');
+      }
+
+      toast.success('Пункт заявки успішно скасовано');
+      closeCancelModal();
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -108,9 +224,37 @@ const OrderList = () => {
                       <span className="text-muted-foreground">·</span>
                       <span className="text-muted-foreground">{item.quantity} {item.unit.symbol}</span>
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]}`}>
-                      {statusLabels[item.status]}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {item.approvedById && (
+                        <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                          ✓ Погоджено
+                        </span>
+                      )}
+                      {item.rejectedById && (
+                        <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                          ✗ {item.rejectionReason}
+                        </span>
+                      )}
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]}`}>
+                        {statusLabels[item.status]}
+                      </span>
+                      {allowEdit && item.rejectedById && (
+                        <button
+                          onClick={() => openEditModal(item, order.id)}
+                          className="text-xs text-primary hover:text-primary/80 font-medium"
+                        >
+                          Редагувати
+                        </button>
+                      )}
+                      {allowEdit && !item.approvedById && !item.rejectedById && (
+                        <button
+                          onClick={() => openCancelModal(item.id, order.id)}
+                          className="text-lg text-destructive hover:text-destructive/80 font-medium leading-none"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -118,6 +262,79 @@ const OrderList = () => {
           )}
         </div>
       ))}
+
+      {/* Модальное окно для указания причины отмены */}
+      {rejectModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-md w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Причина відмови</h3>
+            <textarea
+              value={rejectModal.reason}
+              onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
+              className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[100px] resize-none"
+              placeholder="Вкажіть причину відмови..."
+              autoFocus
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={closeRejectModal}
+                className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={handleReject}
+                className="flex-1 py-2 px-4 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90"
+              >
+                Відхилити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно редактирования пункта заявки */}
+      {editModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 border border-border">
+            <OrderItemEditForm
+              item={editModal.item}
+              orderId={editModal.orderId}
+              onSave={() => {
+                closeEditModal();
+                fetchOrders();
+              }}
+              onCancel={closeEditModal}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно подтверждения отмены пункта заявки */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-sm w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Підтвердження скасування</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Ви впевнені, що хочете скасувати цей пункт заявки? Цю дію неможливо скасувати.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={closeCancelModal}
+                className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={handleCancel}
+                className="flex-1 py-2 px-4 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90"
+              >
+                Видалити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

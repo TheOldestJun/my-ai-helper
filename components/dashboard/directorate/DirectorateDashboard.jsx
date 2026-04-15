@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import OrderList from '../shared/OrderList';
+import DirectorateOrderList from './DirectorateOrderList';
 
 const DirectorateDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
@@ -37,7 +37,7 @@ const DirectorateDashboard = () => {
       <div className="py-2">
         {activeTab === 'orders' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <OrderList />
+            <DirectorateOrderList />
           </div>
         )}
       </div>

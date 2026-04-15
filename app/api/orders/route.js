@@ -17,12 +17,22 @@ export async function GET(request) {
         priority: true,
         notes: true,
         createdAt: true,
+        approvedById: true,
+        approvedAt: true,
+        rejectedById: true,
+        rejectedAt: true,
+        rejectionReason: true,
         products: {
           select: {
             id: true,
             quantity: true,
             status: true,
             notes: true,
+            approvedById: true,
+            approvedAt: true,
+            rejectedById: true,
+            rejectedAt: true,
+            rejectionReason: true,
             product: {
               select: {
                 id: true,
@@ -44,7 +54,19 @@ export async function GET(request) {
       },
     });
 
-    return NextResponse.json({ orders }, { status: 200 });
+    // Удаляем пустые заявки
+    const emptyOrders = orders.filter(order => order.products.length === 0);
+    for (const emptyOrder of emptyOrders) {
+      await prisma.order.delete({
+        where: { id: emptyOrder.id },
+      });
+      console.log('Deleted empty order:', emptyOrder.number);
+    }
+
+    // Возвращаем только непустые заявки
+    const nonEmptyOrders = orders.filter(order => order.products.length > 0);
+
+    return NextResponse.json({ orders: nonEmptyOrders }, { status: 200 });
   } catch (error) {
     console.error('Помилка отримання замовлень:', error);
     return NextResponse.json(

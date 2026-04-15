@@ -15,17 +15,19 @@ datasource db {
 }
 
 model User {
-  id             String      @id @default(cuid())
-  email          String      @unique
-  password       String
-  firstName      String?
-  lastName       String?
-  roles          UserRole[]
-  orders         Order[]
-  approvedOrders Order[]     @relation("OrderApprover")
-  rejectedOrders Order[]     @relation("OrderRejector")
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  id                String         @id @default(cuid())
+  email             String         @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  roles             UserRole[]
+  orders            Order[]
+  approvedOrders    Order[]        @relation("OrderApprover")
+  rejectedOrders    Order[]        @relation("OrderRejector")
+  approvedProducts  OrderProduct[]  @relation("ProductApprover")
+  rejectedProducts  OrderProduct[]  @relation("ProductRejector")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
 
 model Role {
@@ -100,17 +102,24 @@ model Order {
 }
 
 model OrderProduct {
-  id        String      @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Float
-  unitId    String
-  status    OrderStatus @default(PENDING)
-  notes     String?
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  unit      Unit        @relation(fields: [unitId], references: [id])
-  createdAt DateTime    @default(now())
+  id             String      @id @default(cuid())
+  orderId        String
+  productId      String
+  quantity       Float
+  unitId         String
+  status         OrderStatus @default(PENDING)
+  notes          String?
+  approvedById   String?
+  approvedBy     User?       @relation("ProductApprover", fields: [approvedById], references: [id])
+  approvedAt     DateTime?
+  rejectedById   String?
+  rejectedBy     User?       @relation("ProductRejector", fields: [rejectedById], references: [id])
+  rejectedAt     DateTime?
+  rejectionReason String?
+  order          Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unit           Unit        @relation(fields: [unitId], references: [id])
+  createdAt      DateTime    @default(now())
 
   @@unique([orderId, productId, unitId])
 }

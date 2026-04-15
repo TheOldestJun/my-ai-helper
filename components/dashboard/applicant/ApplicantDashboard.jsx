@@ -39,7 +39,7 @@ const ApplicantDashboard = () => {
       <div className="py-2">
         {activeTab === 'orders' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <OrderList />
+            <OrderList allowEdit={true} />
           </div>
         )}
 
