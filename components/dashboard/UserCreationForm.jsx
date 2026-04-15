@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 const availableRoles = [
   { name: 'ADMIN', label: 'Адміністратор', description: 'Повний доступ до системи' },
+  { name: 'DIRECTORATE', label: 'Директорат', description: 'Погодження заявок' },
   { name: 'SUPPLY', label: 'Закупівлі', description: 'Управління закупівлями' },
   { name: 'APPLICANT', label: 'Заявник', description: 'Подання заявок на закупівлю' },
   { name: 'KITCHEN', label: 'Кухня', description: 'Управління харчоблоком' },

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 const availableRoles = [
   { name: 'ADMIN', label: 'Адміністратор' },
+  { name: 'DIRECTORATE', label: 'Директорат' },
   { name: 'SUPPLY', label: 'Закупівлі' },
   { name: 'APPLICANT', label: 'Заявник' },
   { name: 'KITCHEN', label: 'Кухня' },
@@ -16,6 +17,7 @@ const roleColors = {
   APPLICANT: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
   KITCHEN: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
   WAREHOUSE: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+  DIRECTORATE: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
 };
 
 const UserList = () => {

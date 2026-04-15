@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+
 import prisma from './index.js';
 
 async function main() {
@@ -37,6 +38,13 @@ async function main() {
       firstName: 'Петро',
       lastName: 'Складник',
       roleName: 'WAREHOUSE',
+    },
+    {
+      email: 'director@test.com',
+      password: 'director123',
+      firstName: 'Директор',
+      lastName: 'Директорат',
+      roleName: 'DIRECTORATE',
     },
   ];
 

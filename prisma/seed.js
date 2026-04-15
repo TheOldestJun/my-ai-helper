@@ -7,6 +7,7 @@ async function main() {
     { name: 'APPLICANT', description: 'Подавач заявок на закупівлю' },
     { name: 'KITCHEN', description: 'Кухня / харчоблок' },
     { name: 'WAREHOUSE', description: 'Складський облік' },
+    { name: 'DIRECTORATE', description: 'Директорат - погодження заявок' },
   ];
 
   for (const role of roles) {

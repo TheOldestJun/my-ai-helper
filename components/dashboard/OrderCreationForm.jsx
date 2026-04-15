@@ -245,6 +245,7 @@ const OrderCreationForm = () => {
                     placeholder="Одиниця..."
                     labelKey="symbol"
                     valueKey="id"
+                    searchKeys={['symbol', 'name']}
                     displayFormat={(u) => `${u.name} (${u.symbol})`}
                     emptyMessage="Нічого не знайдено"
                   />
