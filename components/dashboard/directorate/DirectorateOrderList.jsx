@@ -228,11 +228,10 @@ const DirectorateOrderList = () => {
           {item.approvedById && (
             <div className="border-t border-border pt-3 mt-3">
               <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-2">
-                <span className="font-medium">✓ Погоджено:</span>
+                <span className="font-medium">✓ Погоджено -</span>
                 {item.approvedBy && (
                   <span>
                     {item.approvedBy.firstName} {item.approvedBy.lastName}
-                    {item.approvedAt && ` · ${new Date(item.approvedAt).toLocaleDateString('uk-UA')}`}
                   </span>
                 )}
               </p>

@@ -50,11 +50,18 @@ export async function GET() {
           },
         },
       },
-      orderBy: {
-        order: {
-          createdAt: 'desc',
+      orderBy: [
+        {
+          order: {
+            priority: 'desc',
+          },
         },
-      },
+        {
+          order: {
+            createdAt: 'desc',
+          },
+        },
+      ],
     });
 
     const formattedProducts = approvedProducts.map((item) => ({

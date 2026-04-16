@@ -196,23 +196,25 @@ const ExecutorOrderList = () => {
                   )}
                 </div>
                 <div className="status-dropdown relative">
-                  <button
-                    onClick={() => toggleStatusDropdown(item.id)}
-                    className={`px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity ${statusColors[item.status]} flex items-center gap-1`}
-                  >
-                    {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
-                    {statusLabels[item.status]}
-                  </button>
-                  {item.statusChangedBy && item.statusChangedAt && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
-                    </div>
-                  )}
-                  {item.approvedBy && item.approvedAt && (
-                    <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                      ✓ Погоджено: {item.approvedBy.firstName} {item.approvedBy.lastName} · {new Date(item.approvedAt).toLocaleDateString('uk-UA')}
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => toggleStatusDropdown(item.id)}
+                      className={`px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity ${statusColors[item.status]} flex items-center gap-1`}
+                    >
+                      {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
+                      {statusLabels[item.status]}
+                      {item.statusChangedBy && (
+                        <span className="text-xs text-muted-foreground">
+                          - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName}
+                        </span>
+                      )}
+                    </button>
+                    {item.approvedBy && (
+                      <div className="text-xs text-green-600 dark:text-green-400">
+                        ✓ Погоджено - {item.approvedBy.firstName} {item.approvedBy.lastName}
+                      </div>
+                    )}
+                  </div>
                   {statusDropdown.open && statusDropdown.itemId === item.id && (
                     <div className="absolute right-0 top-full mt-1 bg-card text-card-foreground border border-border rounded-lg shadow-lg z-10 min-w-[150px]">
                       {availableStatuses.map((status) => (

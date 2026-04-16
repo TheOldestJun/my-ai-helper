@@ -292,12 +292,12 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                       <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]} flex items-center gap-1`}>
                         {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                         {statusLabels[item.status]}
+                        {item.statusChangedBy && (
+                          <span className="text-xs text-muted-foreground">
+                            - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName}
+                          </span>
+                        )}
                       </span>
-                      {item.statusChangedBy && item.statusChangedAt && (
-                        <div className="text-xs text-muted-foreground">
-                          {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
-                        </div>
-                      )}
                       {allowEdit && item.rejectedById && (
                         <button
                           onClick={() => openEditModal(item, order.id)}
