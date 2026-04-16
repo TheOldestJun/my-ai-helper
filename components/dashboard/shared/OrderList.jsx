@@ -1,8 +1,20 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import OrderItemEditForm from './OrderItemEditForm';
+
+const statusIcons = {
+  PENDING: Clock,
+  APPROVED: CheckCircle,
+  REJECTED: XCircle,
+  ORDERED: ShoppingCart,
+  PAID: CreditCard,
+  IN_TRANSIT: Truck,
+  COMPLETED: CircleCheck,
+  CANCELLED: X,
+};
 
 const statusLabels = {
   PENDING: 'Очікує',
@@ -277,7 +289,8 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                           ✗ {item.rejectionReason}
                         </span>
                       )}
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]}`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]} flex items-center gap-1`}>
+                        {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                         {statusLabels[item.status]}
                       </span>
                       {allowEdit && item.rejectedById && (

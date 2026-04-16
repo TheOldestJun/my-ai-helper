@@ -1,7 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X } from 'lucide-react';
+
+const statusIcons = {
+  PENDING: Clock,
+  APPROVED: CheckCircle,
+  REJECTED: XCircle,
+  ORDERED: ShoppingCart,
+  PAID: CreditCard,
+  IN_TRANSIT: Truck,
+  COMPLETED: CircleCheck,
+  CANCELLED: X,
+};
 
 const statusLabels = {
   PENDING: 'Очікує',
@@ -186,8 +198,9 @@ const ExecutorOrderList = () => {
                 <div className="status-dropdown relative">
                   <button
                     onClick={() => toggleStatusDropdown(item.id)}
-                    className={`px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity ${statusColors[item.status]}`}
+                    className={`px-2 py-1 text-xs font-medium rounded cursor-pointer hover:opacity-80 transition-opacity ${statusColors[item.status]} flex items-center gap-1`}
                   >
+                    {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                     {statusLabels[item.status]}
                   </button>
                   {statusDropdown.open && statusDropdown.itemId === item.id && (
@@ -196,10 +209,11 @@ const ExecutorOrderList = () => {
                         <button
                           key={status}
                           onClick={() => handleStatusChange(item.orderId, item.id, status)}
-                          className={`w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors ${
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors flex items-center gap-2 ${
                             status === item.status ? 'bg-muted/50 font-medium' : ''
                           }`}
                         >
+                          {React.createElement(statusIcons[status], { className: 'w-4 h-4' })}
                           {statusLabels[status]}
                         </button>
                       ))}
