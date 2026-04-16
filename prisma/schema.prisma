@@ -26,6 +26,7 @@ model User {
   rejectedOrders    Order[]        @relation("OrderRejector")
   approvedProducts  OrderProduct[]  @relation("ProductApprover")
   rejectedProducts  OrderProduct[]  @relation("ProductRejector")
+  statusChangedProducts OrderProduct[] @relation("StatusChanger")
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 }
@@ -116,6 +117,9 @@ model OrderProduct {
   rejectedBy     User?       @relation("ProductRejector", fields: [rejectedById], references: [id])
   rejectedAt     DateTime?
   rejectionReason String?
+  statusChangedById String?
+  statusChangedBy User?       @relation("StatusChanger", fields: [statusChangedById], references: [id])
+  statusChangedAt DateTime?
   order          Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   unit           Unit        @relation(fields: [unitId], references: [id])

@@ -22,6 +22,13 @@ export async function GET(request) {
         rejectedById: true,
         rejectedAt: true,
         rejectionReason: true,
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
         products: {
           select: {
             id: true,
@@ -30,9 +37,24 @@ export async function GET(request) {
             notes: true,
             approvedById: true,
             approvedAt: true,
+            approvedBy: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
             rejectedById: true,
             rejectedAt: true,
             rejectionReason: true,
+            statusChangedBy: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+            statusChangedAt: true,
             product: {
               select: {
                 id: true,

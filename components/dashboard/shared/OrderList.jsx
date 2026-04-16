@@ -280,8 +280,8 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                     </div>
                     <div className="flex items-center gap-2">
                       {item.approvedById && (
-                        <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                          ✓ Погоджено
+                        <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 flex items-center gap-1">
+                          ✓ Погоджено {item.approvedBy && `· ${item.approvedBy.firstName} ${item.approvedBy.lastName}`}
                         </span>
                       )}
                       {item.rejectedById && (
@@ -293,6 +293,11 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                         {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                         {statusLabels[item.status]}
                       </span>
+                      {item.statusChangedBy && item.statusChangedAt && (
+                        <div className="text-xs text-muted-foreground">
+                          {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
+                        </div>
+                      )}
                       {allowEdit && item.rejectedById && (
                         <button
                           onClick={() => openEditModal(item, order.id)}

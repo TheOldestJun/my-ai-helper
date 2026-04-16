@@ -94,6 +94,8 @@ export async function PATCH(request, { params }) {
         where: { id: productId },
         data: {
           status,
+          statusChangedById: userId,
+          statusChangedAt: new Date(),
         },
         include: {
           product: {

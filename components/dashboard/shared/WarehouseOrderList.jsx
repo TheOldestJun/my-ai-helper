@@ -188,6 +188,16 @@ const WarehouseOrderList = () => {
                     {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                     {statusLabels[item.status]}
                   </button>
+                  {item.statusChangedBy && item.statusChangedAt && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
+                    </div>
+                  )}
+                  {item.approvedBy && item.approvedAt && (
+                    <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                      ✓ Погоджено: {item.approvedBy.firstName} {item.approvedBy.lastName} · {new Date(item.approvedAt).toLocaleDateString('uk-UA')}
+                    </div>
+                  )}
                   {statusDropdown.open && statusDropdown.itemId === item.id && (
                     <div className="absolute right-0 top-full mt-1 bg-card text-card-foreground border border-border rounded-lg shadow-lg z-10 min-w-[150px]">
                       {availableStatuses.map((status) => (

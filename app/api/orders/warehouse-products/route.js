@@ -32,6 +32,20 @@ export async function GET() {
             name: true,
           },
         },
+        approvedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        statusChangedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
         unit: {
           select: {
             id: true,
@@ -62,6 +76,10 @@ export async function GET() {
       unitSymbol: item.unit.symbol,
       status: item.status,
       notes: item.notes,
+      approvedBy: item.approvedBy,
+      approvedAt: item.approvedAt,
+      statusChangedBy: item.statusChangedBy,
+      statusChangedAt: item.statusChangedAt,
     }));
 
     return NextResponse.json({ products: formattedProducts }, { status: 200 });

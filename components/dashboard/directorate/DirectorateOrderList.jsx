@@ -8,7 +8,7 @@ const statusLabels = {
   APPROVED: 'Схвалено',
   REJECTED: 'Відхилено',
   ORDERED: 'Замовлено',
-  PAID: 'Оплачено',
+  PAID: 'Сплачено',
   IN_TRANSIT: 'В дорозі',
   COMPLETED: 'Виконано',
   CANCELLED: 'Скасовано',
@@ -148,6 +148,7 @@ const DirectorateOrderList = () => {
       orderNotes: order.notes,
       orderCreatedAt: order.createdAt,
       orderId: order.id,
+      createdBy: order.createdBy,
     }))
   );
 
@@ -177,6 +178,11 @@ const DirectorateOrderList = () => {
               <span className={`px-2 py-1 text-xs font-medium rounded ${priorityColors[item.orderPriority]}`}>
                 {priorityLabels[item.orderPriority]}
               </span>
+              {item.createdBy && (
+                <span className="text-xs text-muted-foreground">
+                  Заявник: {item.createdBy.firstName} {item.createdBy.lastName}
+                </span>
+              )}
             </div>
             <span className="text-sm text-muted-foreground">
               {new Date(item.orderCreatedAt).toLocaleDateString('uk-UA')}
@@ -221,8 +227,14 @@ const DirectorateOrderList = () => {
 
           {item.approvedById && (
             <div className="border-t border-border pt-3 mt-3">
-              <p className="text-xs text-green-600 dark:text-green-400">
-                ✓ Погоджено директором
+              <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-2">
+                <span className="font-medium">✓ Погоджено:</span>
+                {item.approvedBy && (
+                  <span>
+                    {item.approvedBy.firstName} {item.approvedBy.lastName}
+                    {item.approvedAt && ` · ${new Date(item.approvedAt).toLocaleDateString('uk-UA')}`}
+                  </span>
+                )}
               </p>
             </div>
           )}
