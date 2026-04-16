@@ -1,7 +1,7 @@
 'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+
 import OrderItemEditForm from './OrderItemEditForm';
 
 const statusLabels = {
@@ -9,7 +9,7 @@ const statusLabels = {
   APPROVED: 'Схвалено',
   REJECTED: 'Відхилено',
   ORDERED: 'Замовлено',
-  PAID: 'Оплачено',
+  PAID: 'Сплачено',
   IN_TRANSIT: 'В дорозі',
   COMPLETED: 'Виконано',
   CANCELLED: 'Скасовано',
@@ -46,6 +46,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
   const [rejectModal, setRejectModal] = useState({ open: false, orderId: null, reason: '' });
   const [editModal, setEditModal] = useState({ open: false, item: null, orderId: null });
   const [cancelModal, setCancelModal] = useState({ open: false, itemId: null, orderId: null });
+  const [deleteOrderModal, setDeleteOrderModal] = useState({ open: false, orderId: null });
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -177,6 +178,33 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
     }
   };
 
+  const openDeleteOrderModal = (orderId) => {
+    setDeleteOrderModal({ open: true, orderId });
+  };
+
+  const closeDeleteOrderModal = () => {
+    setDeleteOrderModal({ open: false, orderId: null });
+  };
+
+  const handleDeleteOrder = async () => {
+    try {
+      const response = await fetch(`/api/orders/${deleteOrderModal.orderId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка при видаленні заявки');
+      }
+
+      toast.success('Заявку успішно видалено');
+      closeDeleteOrderModal();
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -213,6 +241,17 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
             <p className="text-sm text-muted-foreground mb-3">{order.notes}</p>
           )}
 
+          {allowEdit && (order.rejectedById || (order.products && order.products.some(item => item.rejectedById))) && (
+            <div className="mb-3">
+              <button
+                onClick={() => openDeleteOrderModal(order.id)}
+                className="text-sm text-destructive hover:text-destructive/80 font-medium"
+              >
+                Видалити заявку
+              </button>
+            </div>
+          )}
+
           {order.products && order.products.length > 0 && (
             <div className="border-t border-border pt-3">
               <p className="text-xs font-medium text-muted-foreground mb-2">Товари:</p>
@@ -223,6 +262,9 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                       <span className="font-medium text-foreground">{item.product.name}</span>
                       <span className="text-muted-foreground">·</span>
                       <span className="text-muted-foreground">{item.quantity} {item.unit.symbol}</span>
+                      {item.notes && (
+                        <span className="text-xs text-muted-foreground italic font-medium">({item.notes})</span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {item.approvedById && (
@@ -246,7 +288,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                           Редагувати
                         </button>
                       )}
-                      {allowEdit && !item.approvedById && !item.rejectedById && (
+                      {allowEdit && !item.approvedById && (
                         <button
                           onClick={() => openCancelModal(item.id, order.id)}
                           className="text-lg text-destructive hover:text-destructive/80 font-medium leading-none"
@@ -327,6 +369,32 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
               </button>
               <button
                 onClick={handleCancel}
+                className="flex-1 py-2 px-4 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90"
+              >
+                Видалити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно подтверждения удаления заявки */}
+      {deleteOrderModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-sm w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Підтвердження видалення заявки</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Ви впевнені, що хочете видалити цю заявку? Цю дію неможливо скасувати.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={closeDeleteOrderModal}
+                className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={handleDeleteOrder}
                 className="flex-1 py-2 px-4 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90"
               >
                 Видалити

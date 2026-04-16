@@ -207,8 +207,8 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Проверяем, что заявка не была одобрена
-    if (existingOrder.approvedById) {
+    // Проверяем, что заявка не была одобрена (но можно удалять отклоненные)
+    if (existingOrder.approvedById && !existingOrder.rejectedById) {
       return NextResponse.json(
         { error: 'Неможливо видалити погоджену заявку' },
         { status: 400 }

@@ -4,7 +4,7 @@ import prisma from '@/prisma';
 export async function PATCH(request, { params }) {
   try {
     const body = await request.json();
-    const { action, userId, rejectionReason } = body;
+    const { action, userId, rejectionReason, status } = body;
     const { id: orderId, productId } = await params;
 
     if (!action || !userId) {
@@ -20,6 +20,7 @@ export async function PATCH(request, { params }) {
         data: {
           approvedById: userId,
           approvedAt: new Date(),
+          status: 'APPROVED',
         },
         include: {
           approvedBy: {
@@ -53,6 +54,7 @@ export async function PATCH(request, { params }) {
           rejectedById: userId,
           rejectedAt: new Date(),
           rejectionReason,
+          status: 'REJECTED',
         },
         include: {
           rejectedBy: {
@@ -72,8 +74,52 @@ export async function PATCH(request, { params }) {
       );
     }
 
+    if (action === 'changeStatus') {
+      if (!status) {
+        return NextResponse.json(
+          { error: 'Не вказано новий статус' },
+          { status: 400 }
+        );
+      }
+
+      const validStatuses = ['ORDERED', 'PAID', 'IN_TRANSIT', 'COMPLETED', 'CANCELLED'];
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json(
+          { error: 'Невірний статус. Доступні статуси: ORDERED, PAID, IN_TRANSIT, COMPLETED, CANCELLED' },
+          { status: 400 }
+        );
+      }
+
+      const orderProduct = await prisma.orderProduct.update({
+        where: { id: productId },
+        data: {
+          status,
+        },
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          unit: {
+            select: {
+              id: true,
+              name: true,
+              symbol: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json(
+        { message: 'Статус успішно змінено', orderProduct },
+        { status: 200 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Невірна дія. Доступні дії: approve, reject' },
+      { error: 'Невірна дія. Доступні дії: approve, reject, changeStatus' },
       { status: 400 }
     );
   } catch (error) {
@@ -166,8 +212,8 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Проверяем, что пункт не был одобрен
-    if (existingOrderProduct.approvedById) {
+    // Проверяем, что пункт не был одобрен (отклоненные можно удалять)
+    if (existingOrderProduct.approvedById && !existingOrderProduct.rejectedById) {
       return NextResponse.json(
         { error: 'Неможливо видалити погоджений пункт заявки' },
         { status: 400 }

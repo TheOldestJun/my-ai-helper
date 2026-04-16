@@ -103,17 +103,17 @@ export async function POST(request) {
     // или используем userId из запроса (временное решение)
     const currentUserId = userId || 'system';
 
-    // Генерируем номер заказа (формат: ORD-YYYYMMDD-XXX)
+    // Генерируем номер заказа (формат: ЗАМ-YYYYMMDD-XXX)
     const today = new Date();
     const datePrefix = today.toISOString().slice(0, 10).replace(/-/g, '');
     const count = await prisma.order.count({
       where: {
         number: {
-          startsWith: `ORD-${datePrefix}`,
+          startsWith: `ЗАМ-${datePrefix}`,
         },
       },
     });
-    const orderNumber = `ORD-${datePrefix}-${String(count + 1).padStart(3, '0')}`;
+    const orderNumber = `ЗАМ-${datePrefix}-${String(count + 1).padStart(3, '0')}`;
 
     // Создаем заказ
     const order = await prisma.order.create({
