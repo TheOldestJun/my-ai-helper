@@ -1,7 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { useOrders } from '../../../hooks/useApi';
+import { useApproveProduct, useRejectProduct } from '../../../hooks/useMutations';
 
 const statusLabels = {
   PENDING: 'Очікує',
@@ -40,29 +44,15 @@ const priorityColors = {
 };
 
 const DirectorateOrderList = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: ordersData, isLoading: loading } = useOrders();
+  const approveProduct = useApproveProduct();
+  const rejectProduct = useRejectProduct();
   const [rejectModal, setRejectModal] = useState({ open: false, productId: null, orderId: null, reason: '' });
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/orders');
-      if (!response.ok) throw new Error('Не вдалося отримати замовлення');
-      const data = await response.json();
-      setOrders(data.orders);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const orders = ordersData?.orders || [];
 
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  const handleApprove = async (orderId, productId) => {
+  const handleApprove = (orderId, productId) => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -71,29 +61,10 @@ const DirectorateOrderList = () => {
       return;
     }
 
-    try {
-      const response = await fetch(`/api/orders/${orderId}/products/${productId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'approve',
-          userId: user.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при погодженні пункту заявки');
-      }
-
-      toast.success('Пункт заявки успішно погоджено');
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    approveProduct.mutate({ orderId, productId, userId: user.id });
   };
 
-  const handleReject = async () => {
+  const handleReject = () => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -107,28 +78,14 @@ const DirectorateOrderList = () => {
       return;
     }
 
-    try {
-      const response = await fetch(`/api/orders/${rejectModal.orderId}/products/${rejectModal.productId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'reject',
-          userId: user.id,
-          rejectionReason: rejectModal.reason,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при відхиленні пункту заявки');
+    rejectProduct.mutate(
+      { orderId: rejectModal.orderId, productId: rejectModal.productId, userId: user.id, rejectionReason: rejectModal.reason },
+      {
+        onSuccess: () => {
+          setRejectModal({ open: false, productId: null, orderId: null, reason: '' });
+        },
       }
-
-      toast.success('Пункт заявки відхилено');
-      setRejectModal({ open: false, productId: null, orderId: null, reason: '' });
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    );
   };
 
   const openRejectModal = (orderId, productId) => {

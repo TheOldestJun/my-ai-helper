@@ -1,8 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Autocomplete from '@/components/Autocomplete';
+import { useProducts, useUnits } from '../../../hooks/useApi';
+import { useCreateProduct, useCreateOrder } from '../../../hooks/useMutations';
 
 const priorityOptions = [
   { value: 'LOW', label: 'Низький' },
@@ -12,8 +15,11 @@ const priorityOptions = [
 ];
 
 const OrderCreationForm = () => {
-  const [products, setProducts] = useState([]);
-  const [units, setUnits] = useState([]);
+  const queryClient = useQueryClient();
+  const { data: productsData } = useProducts();
+  const { data: unitsData } = useUnits();
+  const createProduct = useCreateProduct();
+  const createOrder = useCreateOrder();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -22,28 +28,8 @@ const OrderCreationForm = () => {
     items: [{ productId: '', unitId: '', quantity: '', notes: '' }],
   });
 
-  useEffect(() => {
-    // Загружаем список товаров и единиц измерения
-    const fetchData = async () => {
-      try {
-        const [productsRes, unitsRes] = await Promise.all([
-          fetch('/api/products'),
-          fetch('/api/units'),
-        ]);
-        if (productsRes.ok) {
-          const productsData = await productsRes.json();
-          setProducts(productsData.products || []);
-        }
-        if (unitsRes.ok) {
-          const unitsData = await unitsRes.json();
-          setUnits(unitsData.units || []);
-        }
-      } catch (err) {
-        console.error('Failed to load data:', err);
-      }
-    };
-    fetchData();
-  }, []);
+  const products = productsData?.products || [];
+  const units = unitsData?.units || [];
 
   const handleAddItem = () => {
     setFormData((prev) => ({
@@ -70,30 +56,11 @@ const OrderCreationForm = () => {
 
   const handleCreateProduct = async (index, productName) => {
     try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: productName }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 409) {
-          toast.error('Товар з такою назвою вже існує');
-        } else {
-        toast.error(data.error || 'Помилка при створенні товару');
-        }
-        return;
-      }
-
-      // Добавляємо новий товар в список і вибираємо його
-      setProducts((prev) => [...prev, data.product]);
+      const data = await createProduct.mutateAsync(productName);
       handleItemChange(index, 'productId', data.product.id);
-      toast.success(`Товар "${data.product.name}" успішно створено`);
+      return data.product.id;
     } catch (err) {
-      console.error('Помилка створення товару:', err);
-      toast.error('Помилка з\'єднання при створенні товару');
+      return null;
     }
   };
 
@@ -122,36 +89,24 @@ const OrderCreationForm = () => {
     }
 
     try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priority: formData.priority,
-          notes: formData.notes,
-          userId: user.id,
-          products: validItems.map((item) => ({
-            productId: item.productId,
-            unitId: item.unitId,
-            quantity: parseFloat(item.quantity),
-            notes: item.notes,
-          })),
-        }),
+      await createOrder.mutateAsync({
+        priority: formData.priority,
+        notes: formData.notes,
+        userId: user.id,
+        products: validItems.map((item) => ({
+          productId: item.productId,
+          unitId: item.unitId,
+          quantity: parseFloat(item.quantity),
+          notes: item.notes,
+        })),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Помилка при створенні замовлення');
-      }
-
-      toast.success(`Замовлення №${data.order.number} успішно створено!`);
       setFormData({
         priority: 'NORMAL',
         notes: '',
         items: [{ productId: '', unitId: '', quantity: '', notes: '' }],
       });
     } catch (err) {
-      toast.error(err.message);
+      // Error handling is done in the mutation
     } finally {
       setLoading(false);
     }

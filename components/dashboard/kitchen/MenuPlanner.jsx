@@ -1,8 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Autocomplete from '@/components/Autocomplete';
+import { useDishes } from '../../../hooks/useApi';
+import { useCreateDish } from '../../../hooks/useMutations';
 
 const daysOfWeek = [
   { id: 'monday', label: 'Понеділок' },
@@ -22,28 +25,13 @@ const mealTypes = [
 ];
 
 const MenuPlanner = () => {
-  const [dishes, setDishes] = useState([]);
+  const queryClient = useQueryClient();
+  const { data: dishesData, isLoading: loading } = useDishes();
+  const createDish = useCreateDish();
   const [menu, setMenu] = useState({});
-  const [loading, setLoading] = useState(true);
   const [selectedDays, setSelectedDays] = useState(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
 
-  // Загружаємо список страв
-  useEffect(() => {
-    const fetchDishes = async () => {
-      try {
-        const response = await fetch('/api/dishes');
-        if (response.ok) {
-          const data = await response.json();
-          setDishes(data.dishes || []);
-        }
-      } catch (err) {
-        console.error('Failed to load dishes:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDishes();
-  }, []);
+  const dishes = dishesData?.dishes || [];
 
   // Фільтруємо дні тижня залежно від вибору
   const visibleDays = daysOfWeek.filter((day) => selectedDays.includes(day.id));
@@ -117,33 +105,14 @@ const MenuPlanner = () => {
     });
   };
 
-  const handleCreateDish = async (dishName) => {
-    try {
-      const response = await fetch('/api/dishes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: dishName }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 409) {
-          toast.error('Страва з такою назвою вже існує');
-        } else {
-          toast.error(data.error || 'Помилка при створенні страви');
-        }
+  const handleCreateDish = (dishName) => {
+    return createDish.mutateAsync({ name: dishName })
+      .then((data) => {
+        return data.dish.id;
+      })
+      .catch(() => {
         return null;
-      }
-
-      setDishes((prev) => [...prev, data.dish]);
-      toast.success(`Страву "${data.dish.name}" успішно створено`);
-      return data.dish.id;
-    } catch (err) {
-      console.error('Помилка створення страви:', err);
-      toast.error('Помилка з\'єднання при створенні страви');
-      return null;
-    }
+      });
   };
 
   const handleSave = () => {

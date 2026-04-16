@@ -1,9 +1,12 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 import OrderItemEditForm from './OrderItemEditForm';
+import { useOrders } from '../../../hooks/useApi';
+import { useApproveOrder, useRejectOrder, useDeleteOrder, useDeleteOrderProduct } from '../../../hooks/useMutations';
 
 const statusIcons = {
   PENDING: Clock,
@@ -53,32 +56,20 @@ const priorityColors = {
 };
 
 const OrderList = ({ showActions = false, allowEdit = false }) => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: ordersData, isLoading: loading, error } = useOrders();
+  const approveOrder = useApproveOrder();
+  const rejectOrder = useRejectOrder();
+  const deleteOrder = useDeleteOrder();
+  const deleteOrderProduct = useDeleteOrderProduct();
   const [rejectModal, setRejectModal] = useState({ open: false, orderId: null, reason: '' });
   const [editModal, setEditModal] = useState({ open: false, item: null, orderId: null });
   const [cancelModal, setCancelModal] = useState({ open: false, itemId: null, orderId: null });
   const [deleteOrderModal, setDeleteOrderModal] = useState({ open: false, orderId: null });
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/orders');
-      if (!response.ok) throw new Error('Не вдалося отримати замовлення');
-      const data = await response.json();
-      setOrders(data.orders);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const orders = ordersData?.orders || [];
 
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  const handleApprove = async (orderId) => {
+  const handleApprove = (orderId) => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -87,29 +78,10 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
       return;
     }
 
-    try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'approve',
-          userId: user.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при погодженні заявки');
-      }
-
-      toast.success('Заявку успішно погоджено');
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    approveOrder.mutate({ orderId, userId: user.id });
   };
 
-  const handleReject = async () => {
+  const handleReject = () => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -123,28 +95,14 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
       return;
     }
 
-    try {
-      const response = await fetch(`/api/orders/${rejectModal.orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'reject',
-          userId: user.id,
-          rejectionReason: rejectModal.reason,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при відхиленні заявки');
+    rejectOrder.mutate(
+      { orderId: rejectModal.orderId, userId: user.id, rejectionReason: rejectModal.reason },
+      {
+        onSuccess: () => {
+          setRejectModal({ open: false, orderId: null, reason: '' });
+        },
       }
-
-      toast.success('Заявку відхилено');
-      setRejectModal({ open: false, orderId: null, reason: '' });
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    );
   };
 
   const openRejectModal = (orderId) => {
@@ -171,23 +129,15 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
     setCancelModal({ open: false, itemId: null, orderId: null });
   };
 
-  const handleCancel = async () => {
-    try {
-      const response = await fetch(`/api/orders/${cancelModal.orderId}/products/${cancelModal.itemId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при скасуванні пункту заявки');
+  const handleCancel = () => {
+    deleteOrderProduct.mutate(
+      { orderId: cancelModal.orderId, productId: cancelModal.itemId },
+      {
+        onSuccess: () => {
+          closeCancelModal();
+        },
       }
-
-      toast.success('Пункт заявки успішно скасовано');
-      closeCancelModal();
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    );
   };
 
   const openDeleteOrderModal = (orderId) => {
@@ -198,23 +148,12 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
     setDeleteOrderModal({ open: false, orderId: null });
   };
 
-  const handleDeleteOrder = async () => {
-    try {
-      const response = await fetch(`/api/orders/${deleteOrderModal.orderId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при видаленні заявки');
-      }
-
-      toast.success('Заявку успішно видалено');
-      closeDeleteOrderModal();
-      fetchOrders();
-    } catch (err) {
-      toast.error(err.message);
-    }
+  const handleDeleteOrder = () => {
+    deleteOrder.mutate(deleteOrderModal.orderId, {
+      onSuccess: () => {
+        setDeleteOrderModal({ open: false, orderId: null });
+      },
+    });
   };
 
   if (loading) {
@@ -362,7 +301,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
               orderId={editModal.orderId}
               onSave={() => {
                 closeEditModal();
-                fetchOrders();
+                queryClient.invalidateQueries(['orders']);
               }}
               onCancel={closeEditModal}
             />

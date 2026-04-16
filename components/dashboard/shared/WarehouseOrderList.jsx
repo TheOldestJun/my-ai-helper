@@ -1,8 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Truck, CircleCheck, X } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { useWarehouseProducts } from '../../../hooks/useApi';
+import { useChangeProductStatus } from '../../../hooks/useMutations';
 
 const statusIcons = {
   IN_TRANSIT: Truck,
@@ -37,29 +41,14 @@ const priorityColors = {
 };
 
 const WarehouseOrderList = () => {
-  const [warehouseProducts, setWarehouseProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: warehouseProductsData, isLoading: loading } = useWarehouseProducts();
+  const changeProductStatus = useChangeProductStatus();
   const [statusDropdown, setStatusDropdown] = useState({ open: false, itemId: null });
 
-  const fetchWarehouseProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/orders/warehouse-products');
-      if (!response.ok) throw new Error('Не вдалося отримати заявки для складу');
-      const data = await response.json();
-      setWarehouseProducts(data.products);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const warehouseProducts = warehouseProductsData?.products || [];
 
-  useEffect(() => {
-    fetchWarehouseProducts();
-  }, [fetchWarehouseProducts]);
-
-  const handleStatusChange = async (orderId, productId, newStatus) => {
+  const handleStatusChange = (orderId, productId, newStatus) => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -68,28 +57,14 @@ const WarehouseOrderList = () => {
       return;
     }
 
-    try {
-      const response = await fetch(`/api/orders/${orderId}/products/${productId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'changeStatus',
-          userId: user.id,
-          status: newStatus,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Помилка при зміні статусу');
+    changeProductStatus.mutate(
+      { orderId, productId, status: newStatus, userId: user.id },
+      {
+        onSuccess: () => {
+          setStatusDropdown({ open: false, itemId: null });
+        },
       }
-
-      toast.success('Статус успішно змінено');
-      setStatusDropdown({ open: false, itemId: null });
-      fetchWarehouseProducts();
-    } catch (err) {
-      toast.error(err.message);
-    }
+    );
   };
 
   const toggleStatusDropdown = (itemId) => {
