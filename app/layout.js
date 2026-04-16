@@ -8,6 +8,21 @@ import Providers from "./Providers.js";
 
 import "./globals.css";
 
+/**
+ * RootLayout - Корневой макет приложения
+ * Оборачивает все приложение в провайдеры и базовую структуру
+ * 
+ * Провайдеры:
+ * - Providers: TanStack Query для кеширования данных
+ * - ThemeProvider: Темная/светлая тема
+ * - Toaster: Уведомления (sonner)
+ * 
+ * Структура:
+ * - Header: Шапка сайта с навигацией
+ * - Main: Основное содержимое (страницы)
+ * - Footer: Подвал сайта
+ */
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin", "cyrillic"],

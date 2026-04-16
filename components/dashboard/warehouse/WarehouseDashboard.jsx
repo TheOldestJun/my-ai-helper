@@ -3,6 +3,16 @@
 import { useState } from 'react';
 import WarehouseOrderList from '../shared/WarehouseOrderList';
 
+/**
+ * WarehouseDashboard - Дашборд для складу
+ * Використовується для управління товарами на складі
+ * 
+ * Функціонал:
+ * - Відображення товарів у статусі IN_TRANSIT і вище
+ * - Зміна статусу товарів (IN_TRANSIT -> COMPLETED)
+ * - Відображення інформації про те, хто і коли змінив статус
+ * - Групування товарів за номером заявки
+ */
 const WarehouseDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 

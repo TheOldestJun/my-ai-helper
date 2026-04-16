@@ -1,6 +1,34 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
 
+import { useState, useRef, useEffect } from 'react';
+import { Search, Plus, ChevronDown } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+
+/**
+ * Autocomplete - Компонент автозаполнения с возможностью создания новых элементов
+ * Используется в OrderCreationForm и MenuPlanner для выбора товаров/страв
+ * 
+ * Функционал:
+ * - Поиск по опциям
+ * - Выбор элемента из списка
+ * - Создание нового элемента на лету (если creatable=true)
+ * - Отображение пустого сообщения при отсутствии результатов
+ * - Фильтрация по нескольким полям (searchKeys)
+ * 
+ * Props:
+ * - options: Массив опций для выбора
+ * - value: Текущее выбранное значение
+ * - onChange: Callback при выборе элемента
+ * - onCreate: Callback при создании нового элемента
+ * - creatable: Разрешить создание новых элементов
+ * - createLabel: Текст для кнопки создания
+ * - placeholder: Текст в поле ввода
+ * - labelKey: Ключ для отображения названия
+ * - valueKey: Ключ для значения
+ * - searchKeys: Ключи для поиска
+ * - displayFormat: Функция форматирования отображения
+ * - emptyMessage: Сообщение при отсутствии результатов
+ */
 const Autocomplete = ({
   options,
   value,

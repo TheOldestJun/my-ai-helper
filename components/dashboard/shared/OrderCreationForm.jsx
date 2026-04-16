@@ -7,6 +7,25 @@ import Autocomplete from '@/components/Autocomplete';
 import { useProducts, useUnits } from '../../../hooks/useApi';
 import { useCreateProduct, useCreateOrder } from '../../../hooks/useMutations';
 
+/**
+ * OrderCreationForm - Форма для создания новой заявки
+ * Используется в ApplicantDashboard для создания заявок
+ * 
+ * Функционал:
+ * - Выбор приоритета заявки (LOW, NORMAL, HIGH, URGENT)
+ * - Добавление нескольких товаров в заявку
+ * - Выбор товаров из списка или создание новых на лету
+ * - Выбор единиц измерения
+ * - Указание количества и примечаний
+ * - Добавление примечаний к заявке
+ * 
+ * Хуки TanStack Query:
+ * - useProducts: загрузка списка товаров
+ * - useUnits: загрузка списка единиц измерения
+ * - useCreateProduct: создание нового товара
+ * - useCreateOrder: создание новой заявки
+ */
+
 const priorityOptions = [
   { value: 'LOW', label: 'Низький' },
   { value: 'NORMAL', label: 'Нормальний' },

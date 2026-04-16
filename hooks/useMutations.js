@@ -1,7 +1,30 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-// Order mutations
+/**
+ * Хуки для мутаций (изменения данных) с использованием TanStack Query
+ * Все мутации имеют оптимистичные обновления - UI обновляется мгновенно
+ * При ошибке изменения откатываются
+ * После успешного выполнения кеш инвалидизируется (данные обновляются с сервера)
+ * 
+ * Использование в компонентах:
+ * const mutation = useApproveOrder();
+ * mutation.mutate({ orderId, userId });
+ * 
+ * Или с callback:
+ * mutation.mutate({ orderId, userId }, {
+ *   onSuccess: () => console.log('Success'),
+ * });
+ */
+
+// ==================== ORDER MUTATIONS ====================
+
+/**
+ * Одобряет заявку целиком
+ * Используется в DirectorateOrderList для одобрения заявки директором
+ * 
+ * @param {object} params - { orderId: number, userId: number }
+ */
 export const useApproveOrder = () => {
   const queryClient = useQueryClient();
   
@@ -51,6 +74,12 @@ export const useApproveOrder = () => {
   });
 };
 
+/**
+ * Отклоняет заявку целиком с причиной
+ * Используется в DirectorateOrderList для отклонения заявки директором
+ * 
+ * @param {object} params - { orderId: number, userId: number, rejectionReason: string }
+ */
 export const useRejectOrder = () => {
   const queryClient = useQueryClient();
   
@@ -101,6 +130,12 @@ export const useRejectOrder = () => {
   });
 };
 
+/**
+ * Удаляет заявку (только отклоненные заявки)
+ * Используется в OrderList для удаления отклоненных заявок
+ * 
+ * @param {number} orderId - ID заявки для удаления
+ */
 export const useDeleteOrder = () => {
   const queryClient = useQueryClient();
   
@@ -143,7 +178,15 @@ export const useDeleteOrder = () => {
   });
 };
 
-// OrderProduct mutations
+// ==================== ORDER PRODUCT MUTATIONS ====================
+
+/**
+ * Изменяет статус отдельного пункта заявки
+ * Используется в ExecutorOrderList и WarehouseOrderList для изменения статуса товаров
+ * Поддерживаемые статусы: ORDERED, PAID, IN_TRANSIT, COMPLETED, CANCELLED
+ * 
+ * @param {object} params - { orderId: number, productId: number, status: string, userId: number }
+ */
 export const useChangeProductStatus = () => {
   const queryClient = useQueryClient();
   
@@ -208,6 +251,12 @@ export const useChangeProductStatus = () => {
   });
 };
 
+/**
+ * Удаляет отдельный пункт из заявки (только отклоненные пункты)
+ * Используется в OrderList для удаления отклоненных пунктов
+ * 
+ * @param {object} params - { orderId: number, productId: number }
+ */
 export const useDeleteOrderProduct = () => {
   const queryClient = useQueryClient();
   
@@ -253,6 +302,12 @@ export const useDeleteOrderProduct = () => {
   });
 };
 
+/**
+ * Одобряет отдельный пункт заявки
+ * Используется в DirectorateOrderList для одобрения пункта директором
+ * 
+ * @param {object} params - { orderId: number, productId: number, userId: number }
+ */
 export const useApproveProduct = () => {
   const queryClient = useQueryClient();
   
@@ -305,6 +360,12 @@ export const useApproveProduct = () => {
   });
 };
 
+/**
+ * Отклоняет отдельный пункт заявки с причиной
+ * Используется в DirectorateOrderList для отклонения пункта директором
+ * 
+ * @param {object} params - { orderId: number, productId: number, userId: number, rejectionReason: string }
+ */
 export const useRejectProduct = () => {
   const queryClient = useQueryClient();
   
@@ -358,7 +419,14 @@ export const useRejectProduct = () => {
   });
 };
 
-// Product creation mutation
+// ==================== PRODUCT MUTATIONS ====================
+
+/**
+ * Создает новый товар
+ * Используется в OrderCreationForm при создании товара из autocomplete
+ * 
+ * @param {string} productName - Название нового товара
+ */
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   
@@ -390,7 +458,14 @@ export const useCreateProduct = () => {
   });
 };
 
-// Order creation mutation
+// ==================== ORDER CREATION MUTATIONS ====================
+
+/**
+ * Создает новую заявку
+ * Используется в OrderCreationForm для создания заявок
+ * 
+ * @param {object} orderData - { priority: string, notes: string, userId: number, products: array }
+ */
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
   
@@ -446,7 +521,14 @@ export const useUpdateOrder = () => {
   });
 };
 
-// Dish mutations
+// ==================== DISH MUTATIONS ====================
+
+/**
+ * Создает новую страву
+ * Используется в MenuPlanner при создании стравы из autocomplete
+ * 
+ * @param {object} dishData - { name: string }
+ */
 export const useCreateDish = () => {
   const queryClient = useQueryClient();
   
@@ -475,6 +557,12 @@ export const useCreateDish = () => {
   });
 };
 
+/**
+ * Удаляет страву
+ * Используется в MenuPlanner для удаления страв
+ * 
+ * @param {number} dishId - ID стравы для удаления
+ */
 export const useDeleteDish = () => {
   const queryClient = useQueryClient();
   

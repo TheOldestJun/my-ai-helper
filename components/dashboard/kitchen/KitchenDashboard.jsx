@@ -5,6 +5,21 @@ import MenuPlanner from './MenuPlanner';
 import MilkTracker from './MilkTracker';
 import KitchenCalculations from './KitchenCalculations';
 
+/**
+ * KitchenDashboard - Дашборд для кухни/харчоблоку
+ * Используется для планирования меню и учета продуктов
+ * 
+ * Функционал:
+ * - Планирование меню на неделю (MenuPlanner)
+ * - Учет молока (MilkTracker)
+ * - Расчеты продуктов (KitchenCalculations)
+ * - Переключение между вкладками
+ * 
+ * Вкладки:
+ * - menu: Меню на неделю
+ * - milk: Учет молока
+ * - calculations: Расчеты продуктов
+ */
 const KitchenDashboard = () => {
   const [activeTab, setActiveTab] = useState('menu');
 

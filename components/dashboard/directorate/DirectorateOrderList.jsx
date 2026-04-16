@@ -7,6 +7,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useOrders } from '../../../hooks/useApi';
 import { useApproveProduct, useRejectProduct } from '../../../hooks/useMutations';
 
+/**
+ * DirectorateOrderList - Компонент для директора
+ * Используется в DirectorateDashboard для одобрения/отклонения заявок
+ * 
+ * Функционал:
+ * - Отображение всех заявок для проверки
+ * - Одобрение/отклонение отдельных пунктов заявки
+ * - Отображение информации о заявителе
+ * - Отображение примечаний к заявке и пунктам
+ * - Отображение даты согласования
+ * 
+ * Хуки TanStack Query:
+ * - useOrders: загрузка всех заявок
+ * - useApproveProduct: одобрение пункта заявки
+ * - useRejectProduct: отклонение пункта заявки с причиной
+ */
+
 const statusLabels = {
   PENDING: 'Очікує',
   APPROVED: 'Схвалено',

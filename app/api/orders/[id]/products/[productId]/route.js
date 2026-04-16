@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+/**
+ * API route для управления пунктами заявки
+ * 
+ * PATCH /api/orders/[id]/products/[productId] - Изменение пункта заявки
+ * DELETE /api/orders/[id]/products/[productId] - Удаление пункта заявки
+ * 
+ * PATCH действия:
+ * - approve: Одобрение пункта заявки (для директора)
+ * - reject: Отклонение пункта заявки с причиной
+ * - changeStatus: Изменение статуса пункта (ORDERED, PAID, IN_TRANSIT, COMPLETED, CANCELLED)
+ * 
+ * PATCH тело запроса:
+ * - action: Тип действия
+ * - userId: ID пользователя, выполняющего действие
+ * - status: Новый статус (для changeStatus)
+ * - rejectionReason: Причина отклонения (для reject)
+ */
+
 export async function PATCH(request, { params }) {
   try {
     const body = await request.json();

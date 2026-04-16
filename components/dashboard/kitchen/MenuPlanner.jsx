@@ -7,6 +7,30 @@ import Autocomplete from '@/components/Autocomplete';
 import { useDishes } from '../../../hooks/useApi';
 import { useCreateDish } from '../../../hooks/useMutations';
 
+/**
+ * MenuPlanner - Компонент для планирования меню на неделю
+ * Используется в KitchenDashboard для создания меню на неделю
+ * 
+ * Функционал:
+ * - Выбор страв для каждого дня недели и типа приема пищи
+ * - Создание новых страв на лету
+ * - Выбор рабочих дней недели
+ * - Сохранение меню в localStorage
+ * - Экспорт меню в PDF
+ * 
+ * Типы приемов пищи:
+ * - soup: Первая страва
+ * - garnish: Гарнир
+ * - meat: Мясная страва
+ * - salad: Салат
+ * - bakery: Выпечка
+ * - drink: Напій
+ * 
+ * Хуки TanStack Query:
+ * - useDishes: загрузка списка страв
+ * - useCreateDish: создание новой стравы
+ */
+
 const daysOfWeek = [
   { id: 'monday', label: 'Понеділок' },
   { id: 'tuesday', label: 'Вівторок' },

@@ -4,6 +4,21 @@ import { useState } from 'react';
 import OrderList from '../shared/OrderList';
 import OrderCreationForm from '../shared/OrderCreationForm';
 
+/**
+ * ApplicantDashboard - Дашборд для заявителей
+ * Используется для создания и управления заявками
+ * 
+ * Функционал:
+ * - Просмотр списка своих заявок
+ * - Создание новых заявок
+ * - Переключение между вкладками (список / создание)
+ * - Отображение статусов заявок
+ * - Удаление отклоненных заявок и пунктов
+ * 
+ * Вкладки:
+ * - list: Список заявок (OrderList)
+ * - create: Создание новой заявки (OrderCreationForm)
+ */
 const ApplicantDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 

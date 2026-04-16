@@ -1,6 +1,22 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+/**
+ * API route для управления заявками
+ * 
+ * GET /api/orders - Получение списка заявок
+ * POST /api/orders - Создание новой заявки
+ * 
+ * GET параметры:
+ * - userId: ID пользователя для фильтрации заявок
+ * 
+ * POST тело запроса:
+ * - priority: Приоритет заявки (LOW, NORMAL, HIGH, URGENT)
+ * - notes: Примечания к заявке
+ * - userId: ID пользователя, создающего заявку
+ * - products: Массив товаров [{ productId, unitId, quantity, notes }]
+ */
+
 export async function GET(request) {
   try {
     // Получаем userId из query параметра (временное решение до добавления auth middleware)

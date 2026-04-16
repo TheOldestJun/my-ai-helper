@@ -1,8 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Menu, X, LogOut, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+
+/**
+ * Header - Компонент шапки сайта
+ * Отображает логотип, навигацию и информацию о пользователе
+ * 
+ * Функционал:
+ * - Отображение логотипа
+ * - Навигация между дашбордами в зависимости от роли пользователя
+ * - Мобильное меню (гамбургер)
+ * - Выход из системы
+ * - Отображение информации о текущем пользователе
+ */
 import { ThemeToggle } from './ThemeToggle';
 
 const Header = () => {

@@ -4,6 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// Prisma schema - Схема базы данных
+// Описывает структуру всех таблиц и отношений между ними
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,6 +17,11 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+/**
+ * User - Пользователи системы
+ * Роли: APPLICANT (заявитель), DIRECTOR (директор), SUPPLY (снабжение),
+ *       WAREHOUSE (склад), KITCHEN (кухня), ADMIN (администратор)
+ */
 model User {
   id                String         @id @default(cuid())
   email             String         @unique

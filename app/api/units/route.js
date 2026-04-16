@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+/**
+ * API route для управления единицами измерения
+ * 
+ * GET /api/units - Получение списка всех единиц измерения
+ * POST /api/units - Создание новой единицы измерения
+ * 
+ * POST тело запроса:
+ * - name: Название единицы (например, "Кілограм")
+ * - symbol: Символ единицы (например, "кг")
+ */
+
 export async function GET() {
   try {
     const units = await prisma.unit.findMany({

@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
-
 import prisma from '@/prisma';
+
+/**
+ * API route для управления товарами
+ * 
+ * GET /api/products - Получение списка всех товаров
+ * POST /api/products - Создание нового товара
+ * 
+ * POST тело запроса:
+ * - name: Название товара
+ * - description: Описание товара
+ */
 
 export async function GET() {
   try {

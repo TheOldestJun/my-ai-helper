@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+/**
+ * API route для управления стравами
+ * 
+ * GET /api/dishes - Получение списка всех страв
+ * POST /api/dishes - Создание новой стравы
+ * 
+ * POST тело запроса:
+ * - name: Название стравы
+ */
+
 // GET /api/dishes - получить список блюд
 export async function GET() {
   try {

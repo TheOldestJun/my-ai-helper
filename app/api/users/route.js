@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+/**
+ * API route для управления пользователями
+ * 
+ * GET /api/users - Получение списка всех пользователей
+ * POST /api/users - Создание нового пользователя
+ * 
+ * POST тело запроса:
+ * - email: Email пользователя
+ * - password: Пароль пользователя
+ * - firstName: Имя пользователя
+ * - lastName: Фамилия пользователя
+ * - role: Роль пользователя (APPLICANT, DIRECTOR, SUPPLY, WAREHOUSE, KITCHEN)
+ */
+
 export async function GET() {
   try {
     const users = await prisma.user.findMany({

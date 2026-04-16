@@ -1,5 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import packageJson from '../package.json';
+
+/**
+ * Footer - Компонент подвала сайта
+ * Отображает версию приложения и ссылки
+ * 
+ * Функционал:
+ * - Отображение версии приложения из package.json
+ * - Отображение года
+ * - Ссылка на разработчика
+ */
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

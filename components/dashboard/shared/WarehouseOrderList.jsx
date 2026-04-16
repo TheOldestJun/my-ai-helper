@@ -8,6 +8,21 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useWarehouseProducts } from '../../../hooks/useApi';
 import { useChangeProductStatus } from '../../../hooks/useMutations';
 
+/**
+ * WarehouseOrderList - Компонент для склада
+ * Используется в WarehouseDashboard для отображения товаров на складе
+ * 
+ * Функционал:
+ * - Отображение товаров в статусе IN_TRANSIT и выше
+ * - Изменение статуса товаров (IN_TRANSIT -> COMPLETED)
+ * - Отображение информации о том, кто и когда изменил статус
+ * - Группировка товаров по номеру заявки
+ * 
+ * Хуки TanStack Query:
+ * - useWarehouseProducts: загрузка товаров на складе
+ * - useChangeProductStatus: изменение статуса товара
+ */
+
 const statusIcons = {
   IN_TRANSIT: Truck,
   COMPLETED: CircleCheck,

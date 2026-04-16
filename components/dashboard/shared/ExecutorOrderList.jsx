@@ -8,6 +8,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useApprovedProducts, useWarehouseProducts } from '../../../hooks/useApi';
 import { useChangeProductStatus } from '../../../hooks/useMutations';
 
+/**
+ * ExecutorOrderList - Компонент для исполнителей (снабжение, склад)
+ * Используется в SupplyDashboard и WarehouseDashboard
+ * 
+ * Функционал:
+ * - Отображение одобренных товаров для заказа (снабжение)
+ * - Отображение товаров в пути и прибывших (склад)
+ * - Изменение статуса товаров через dropdown
+ * - Группировка товаров по номеру заявки
+ * - Отображение приоритетов и примечаний
+ * 
+ * Хуки TanStack Query:
+ * - useApprovedProducts: загрузка одобренных товаров
+ * - useWarehouseProducts: загрузка товаров на складе
+ * - useChangeProductStatus: изменение статуса товара
+ */
+
 const statusIcons = {
   PENDING: Clock,
   APPROVED: CheckCircle,

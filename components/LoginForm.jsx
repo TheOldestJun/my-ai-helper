@@ -1,7 +1,26 @@
 'use client';
+
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
+/**
+ * LoginForm - Форма входа в систему
+ * Используется для аутентификации пользователей
+ * 
+ * Функционал:
+ * - Ввод email и пароля
+ * - Отправка данных на сервер для проверки
+ * - Сохранение пользователя в localStorage при успешном входе
+ * - Перенаправление на соответствующий дашборд в зависимости от роли
+ * 
+ * Роли и дашборды:
+ * - APPLICANT: /dashboard
+ * - DIRECTOR: /dashboard
+ * - SUPPLY: /dashboard
+ * - WAREHOUSE: /dashboard
+ * - KITCHEN: /dashboard
+ */
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server';
+
 import prisma from '@/prisma';
 
+/**
+ * API route для управления конкретной заявкой
+ * 
+ * GET /api/orders/[id] - Получение заявки по ID
+ * PATCH /api/orders/[id] - Одобрение/отклонение заявки
+ * PUT /api/orders/[id] - Обновление заявки
+ * DELETE /api/orders/[id] - Удаление заявки
+ * 
+ * PATCH действия:
+ * - approve: Одобрение заявки (для директора)
+ * - reject: Отклонение заявки с причиной
+ * 
+ * PUT тело запроса:
+ * - priority: Новый приоритет
+ * - notes: Новые примечания
+ * - products: Массив товаров для обновления
+ */
 export async function PATCH(request, { params }) {
   try {
     const body = await request.json();

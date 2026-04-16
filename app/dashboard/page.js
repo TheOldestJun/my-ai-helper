@@ -1,3 +1,17 @@
+/**
+ * Dashboard page - Главная страница дашборда
+ * Отображает соответствующий дашборд в зависимости от роли пользователя
+ * 
+ * Роли и дашборды:
+ * - ADMIN: AdminDashboard (административный дашборд)
+ * - APPLICANT: ApplicantDashboard (создание и управление заявками)
+ * - DIRECTORATE: DirectorateDashboard (одобрение/отклонение заявок)
+ * - SUPPLY: SupplyDashboard (заказ товаров)
+ * - WAREHOUSE: WarehouseDashboard (управление складом)
+ * - KITCHEN: KitchenDashboard (планирование меню)
+ * 
+ * Если пользователь не авторизован, перенаправляет на страницу входа
+ */
 'use client';
 
 import { useState, useEffect } from 'react';

@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/prisma';
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+/**
+ * API route для получения товаров на складе
+ * 
+ * GET /api/orders/warehouse-products - Получение списка товаров на складе
+ * 
+ * Используется складом для отображения товаров, которые поступили на склад
+ * или находятся в пути (IN_TRANSIT и выше).
+ * 
+ * Возвращает товары в статусе IN_TRANSIT, COMPLETED, с информацией
+ * о том, кто и когда изменил статус.
+ */
 
 export async function GET() {
   try {

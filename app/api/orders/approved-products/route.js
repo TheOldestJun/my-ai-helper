@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/prisma';
 
-const prisma = new PrismaClient();
+/**
+ * API route для получения одобренных товаров
+ * 
+ * GET /api/orders/approved-products - Получение списка одобренных товаров
+ * 
+ * Используется исполнителями (снабжение, склад) для отображения товаров,
+ * которые нужно заказать или уже поступили на склад.
+ * 
+ * Возвращает товары в статусе APPROVED и выше, сгруппированные по заявкам.
+ * Сортируется по приоритету: URGENT > HIGH > NORMAL > LOW
+ */
 
 export async function GET() {
   try {

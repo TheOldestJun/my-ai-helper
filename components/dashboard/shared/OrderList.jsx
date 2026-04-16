@@ -8,6 +8,26 @@ import OrderItemEditForm from './OrderItemEditForm';
 import { useOrders } from '../../../hooks/useApi';
 import { useApproveOrder, useRejectOrder, useDeleteOrder, useDeleteOrderProduct } from '../../../hooks/useMutations';
 
+/**
+ * OrderList - Компонент для отображения списка заявок
+ * Используется в ApplicantDashboard для заявителей
+ * 
+ * Функционал:
+ * - Отображение всех заявок текущего пользователя
+ * - Одобрение/отклонение заявок (для директора)
+ * - Удаление отклоненных заявок
+ * - Удаление отклоненных пунктов из заявки
+ * - Редактирование пунктов заявки
+ * - Отображение статусов с иконками
+ * 
+ * Хуки TanStack Query:
+ * - useOrders: загрузка заявок
+ * - useApproveOrder: одобрение заявки
+ * - useRejectOrder: отклонение заявки
+ * - useDeleteOrder: удаление заявки
+ * - useDeleteOrderProduct: удаление пункта
+ */
+
 const statusIcons = {
   PENDING: Clock,
   APPROVED: CheckCircle,

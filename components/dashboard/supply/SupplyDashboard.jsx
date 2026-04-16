@@ -3,6 +3,16 @@
 import { useState } from 'react';
 import ExecutorOrderList from '../shared/ExecutorOrderList';
 
+/**
+ * SupplyDashboard - Дашборд для снабжения
+ * Используется для заказа одобренных товаров
+ * 
+ * Функционал:
+ * - Отображение списка одобренных товаров для заказа
+ * - Изменение статуса товаров (ORDERED, PAID, IN_TRANSIT, COMPLETED)
+ * - Группировка товаров по номеру заявки
+ * - Отображение приоритетов и примечаний
+ */
 const SupplyDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 
