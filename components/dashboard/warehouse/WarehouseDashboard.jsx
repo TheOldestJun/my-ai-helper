@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import ExecutorOrderList from '../shared/ExecutorOrderList';
+import WarehouseOrderList from '../shared/WarehouseOrderList';
 
 const WarehouseDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
@@ -60,7 +60,7 @@ const WarehouseDashboard = () => {
       <div className="py-2">
         {activeTab === 'orders' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <ExecutorOrderList />
+            <WarehouseOrderList />
           </div>
         )}
 
