@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import packageJson from '../package.json';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const version = packageJson.version;
 
   return (
     <footer className="bg-slate-900 dark:bg-slate-950 text-slate-300">
@@ -12,6 +14,8 @@ const Footer = () => {
             <span className="font-medium text-white">My AI Helper</span>
             <span className="mx-2">·</span>
             <span className="text-slate-400">&copy; {currentYear}</span>
+            <span className="mx-2">·</span>
+            <span className="text-slate-500">v{version}</span>
           </div>
 
           {/* Links */}

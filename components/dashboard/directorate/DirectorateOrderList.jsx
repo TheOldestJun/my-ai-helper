@@ -232,6 +232,7 @@ const DirectorateOrderList = () => {
                 {item.approvedBy && (
                   <span>
                     {item.approvedBy.firstName} {item.approvedBy.lastName}
+                    {item.approvedAt && ` · ${new Date(item.approvedAt).toLocaleDateString('uk-UA')}`}
                   </span>
                 )}
               </p>

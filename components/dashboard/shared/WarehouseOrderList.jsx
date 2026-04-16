@@ -188,15 +188,15 @@ const WarehouseOrderList = () => {
                     >
                       {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                       {statusLabels[item.status]}
-                      {item.statusChangedBy && (
+                      {item.statusChangedBy && item.statusChangedAt && (
                         <span className="text-xs text-muted-foreground">
-                          - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName}
+                          - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
                         </span>
                       )}
                     </button>
-                    {item.approvedBy && (
+                    {item.approvedBy && item.approvedAt && (
                       <div className="text-xs text-green-600 dark:text-green-400">
-                        ✓ Погоджено - {item.approvedBy.firstName} {item.approvedBy.lastName}
+                        ✓ Погоджено - {item.approvedBy.firstName} {item.approvedBy.lastName} · {new Date(item.approvedAt).toLocaleDateString('uk-UA')}
                       </div>
                     )}
                   </div>

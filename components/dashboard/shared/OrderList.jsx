@@ -292,9 +292,9 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                       <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]} flex items-center gap-1`}>
                         {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
                         {statusLabels[item.status]}
-                        {item.statusChangedBy && (
+                        {item.statusChangedBy && item.statusChangedAt && (
                           <span className="text-xs text-muted-foreground">
-                            - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName}
+                            - {item.statusChangedBy.firstName} {item.statusChangedBy.lastName} · {new Date(item.statusChangedAt).toLocaleDateString('uk-UA')}
                           </span>
                         )}
                       </span>
