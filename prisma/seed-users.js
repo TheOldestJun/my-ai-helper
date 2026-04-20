@@ -5,6 +5,13 @@ import prisma from './index.js';
 async function main() {
   const usersData = [
     {
+      email: 'admin@mail.com',
+      password: 'admin123',
+      firstName: 'Станислав',
+      lastName: 'Пуха',
+      roleName: 'ADMIN',
+    },
+    {
       email: 'admin@test.com',
       password: 'admin123',
       firstName: 'Адмін',

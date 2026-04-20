@@ -14,7 +14,7 @@ import { useChangeProductStatus } from '../../../hooks/useMutations';
  * 
  * Функционал:
  * - Отображение товаров в статусе IN_TRANSIT и выше
- * - Изменение статуса товаров (IN_TRANSIT -> COMPLETED)
+ * - Изменение статуса товаров (IN_TRANSIT -> RECEIVED) - только склад
  * - Отображение информации о том, кто и когда изменил статус
  * - Группировка товаров по номеру заявки
  * 
@@ -25,19 +25,19 @@ import { useChangeProductStatus } from '../../../hooks/useMutations';
 
 const statusIcons = {
   IN_TRANSIT: Truck,
-  COMPLETED: CircleCheck,
+  RECEIVED: CircleCheck,
   CANCELLED: X,
 };
 
 const statusLabels = {
   IN_TRANSIT: 'В дорозі',
-  COMPLETED: 'Виконано',
+  RECEIVED: 'Отримано',
   CANCELLED: 'Скасовано',
 };
 
 const statusColors = {
   IN_TRANSIT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  COMPLETED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+  RECEIVED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
   CANCELLED: 'bg-muted text-muted-foreground',
 };
 
@@ -138,7 +138,7 @@ const WarehouseOrderList = () => {
     );
   }
 
-  const availableStatuses = ['IN_TRANSIT', 'COMPLETED'];
+  const availableStatuses = ['IN_TRANSIT', 'RECEIVED'];
 
   return (
     <div className="space-y-4">

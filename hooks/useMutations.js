@@ -183,7 +183,8 @@ export const useDeleteOrder = () => {
 /**
  * Изменяет статус отдельного пункта заявки
  * Используется в ExecutorOrderList и WarehouseOrderList для изменения статуса товаров
- * Поддерживаемые статусы: ORDERED, PAID, IN_TRANSIT, COMPLETED, CANCELLED
+ * Поддерживаемые статусы: ORDERED, PAID, IN_TRANSIT, RECEIVED, CANCELLED
+ * Статус RECEIVED может устанавливать только склад
  * 
  * @param {object} params - { orderId: number, productId: number, status: string, userId: number }
  */

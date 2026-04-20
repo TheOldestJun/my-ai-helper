@@ -9,7 +9,7 @@ import prisma from '@/prisma';
  * Используется складом для отображения товаров, которые поступили на склад
  * или находятся в пути (IN_TRANSIT и выше).
  * 
- * Возвращает товары в статусе IN_TRANSIT, COMPLETED, с информацией
+ * Возвращает товары в статусе IN_TRANSIT, RECEIVED, с информацией
  * о том, кто и когда изменил статус.
  */
 
@@ -22,7 +22,7 @@ export async function GET() {
         },
         rejectedById: null,
         status: {
-          in: ['IN_TRANSIT', 'COMPLETED'],
+          in: ['IN_TRANSIT', 'RECEIVED'],
         },
       },
       include: {

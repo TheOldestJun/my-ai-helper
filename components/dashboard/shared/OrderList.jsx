@@ -35,7 +35,7 @@ const statusIcons = {
   ORDERED: ShoppingCart,
   PAID: CreditCard,
   IN_TRANSIT: Truck,
-  COMPLETED: CircleCheck,
+  RECEIVED: CircleCheck,
   CANCELLED: X,
 };
 
@@ -46,7 +46,7 @@ const statusLabels = {
   ORDERED: 'Замовлено',
   PAID: 'Сплачено',
   IN_TRANSIT: 'В дорозі',
-  COMPLETED: 'Виконано',
+  RECEIVED: 'Отримано',
   CANCELLED: 'Скасовано',
 };
 
@@ -57,7 +57,7 @@ const statusColors = {
   ORDERED: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
   PAID: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
   IN_TRANSIT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  COMPLETED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+  RECEIVED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
   CANCELLED: 'bg-muted text-muted-foreground',
 };
 
@@ -78,6 +78,7 @@ const priorityColors = {
 const OrderList = ({ showActions = false, allowEdit = false }) => {
   const queryClient = useQueryClient();
   const { data: ordersData, isLoading: loading, error } = useOrders();
+  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, text: '' });
   const approveOrder = useApproveOrder();
   const rejectOrder = useRejectOrder();
   const deleteOrder = useDeleteOrder();
@@ -88,6 +89,20 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
   const [deleteOrderModal, setDeleteOrderModal] = useState({ open: false, orderId: null });
 
   const orders = ordersData?.orders || [];
+
+  const handleTooltip = (e, text) => {
+    const rect = e.target.getBoundingClientRect();
+    setTooltip({
+      show: true,
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8,
+      text,
+    });
+  };
+
+  const hideTooltip = () => {
+    setTooltip({ show: false, x: 0, y: 0, text: '' });
+  };
 
   const handleApprove = (orderId) => {
     const storedUser = localStorage.getItem('user');
@@ -268,6 +283,8 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                       {allowEdit && !item.approvedById && (
                         <button
                           onClick={() => openCancelModal(item.id, order.id)}
+                          onMouseEnter={(e) => handleTooltip(e, 'Скасувати пункт заявки')}
+                          onMouseLeave={hideTooltip}
                           className="text-lg text-destructive hover:text-destructive/80 font-medium leading-none"
                         >
                           ×
@@ -281,6 +298,20 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
           )}
         </div>
       ))}
+
+      {/* Custom Tooltip */}
+      {tooltip.show && (
+        <div
+          className="fixed bg-foreground text-background px-2 py-1 text-xs rounded shadow-lg pointer-events-none z-50"
+          style={{
+            left: `${tooltip.x}px`,
+            top: `${tooltip.y}px`,
+            transform: 'translate(-50%, -100%)',
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
 
       {/* Модальное окно для указания причины отмены */}
       {rejectModal.open && (

@@ -149,7 +149,7 @@ enum OrderStatus {
   ORDERED
   PAID
   IN_TRANSIT
-  COMPLETED
+  RECEIVED
   CANCELLED
 }
 

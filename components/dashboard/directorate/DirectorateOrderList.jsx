@@ -31,7 +31,7 @@ const statusLabels = {
   ORDERED: 'Замовлено',
   PAID: 'Сплачено',
   IN_TRANSIT: 'В дорозі',
-  COMPLETED: 'Виконано',
+  RECEIVED: 'Отримано',
   CANCELLED: 'Скасовано',
 };
 
@@ -42,7 +42,7 @@ const statusColors = {
   ORDERED: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
   PAID: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
   IN_TRANSIT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  COMPLETED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+  RECEIVED: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
   CANCELLED: 'bg-muted text-muted-foreground',
 };
 

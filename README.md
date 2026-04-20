@@ -112,7 +112,7 @@ npm run dev
 3. **ORDERED** - Товар заказан
 4. **PAID** - Товар оплачен
 5. **IN_TRANSIT** - Товар в пути
-6. **COMPLETED** - Товар получен
+6. **RECEIVED** - Товар получен (только склад)
 7. **CANCELLED** - Пункт отменен
 
 ## API Routes

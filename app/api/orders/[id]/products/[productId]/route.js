@@ -100,12 +100,34 @@ export async function PATCH(request, { params }) {
         );
       }
 
-      const validStatuses = ['ORDERED', 'PAID', 'IN_TRANSIT', 'COMPLETED', 'CANCELLED'];
+      const validStatuses = ['ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED', 'CANCELLED'];
       if (!validStatuses.includes(status)) {
         return NextResponse.json(
-          { error: 'Невірний статус. Доступні статуси: ORDERED, PAID, IN_TRANSIT, COMPLETED, CANCELLED' },
+          { error: 'Невірний статус. Доступні статуси: ORDERED, PAID, IN_TRANSIT, RECEIVED, CANCELLED' },
           { status: 400 }
         );
+      }
+
+      // Проверка: статус RECEIVED может устанавливать только склад
+      if (status === 'RECEIVED') {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          include: {
+            roles: {
+              include: {
+                role: true,
+              },
+            },
+          },
+        });
+
+        const hasWarehouseRole = user?.roles?.some(r => r.role.name === 'WAREHOUSE');
+        if (!hasWarehouseRole) {
+          return NextResponse.json(
+            { error: 'Статус "Отримано" може встановлювати тільки склад' },
+            { status: 403 }
+          );
+        }
       }
 
       const orderProduct = await prisma.orderProduct.update({
