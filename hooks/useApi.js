@@ -150,3 +150,25 @@ export const useUsers = () => {
     },
   });
 };
+
+/**
+ * Загружает архивные заявки (только для снабжения)
+ * Используется в ArchiveOrders компоненте для отображения архивных заявок
+ * Архивные заявки хранятся не старше 3 лет
+ * 
+ * @param {number} userId - ID пользователя снабжения
+ * @returns {object} Результат запроса с данными { orders: [...] }
+ */
+export const useArchivedOrders = (userId) => {
+  return useQuery({
+    queryKey: ['archived-orders', userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/orders/archived?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error('Помилка при отриманні архівних заявок');
+      }
+      return response.json();
+    },
+    enabled: !!userId,
+  });
+};

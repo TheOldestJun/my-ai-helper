@@ -23,7 +23,31 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
+    // Проверяем роль пользователя для фильтрации архивных заявок
+    let filterArchived = true;
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      // Снабжение может видеть все заявки, включая архивные
+      const hasSupplyRole = user?.roles?.some(r => r.role.name === 'SUPPLY');
+      if (hasSupplyRole) {
+        filterArchived = false;
+      }
+    }
+
     const whereClause = userId ? { createdById: userId } : {};
+    if (filterArchived) {
+      whereClause.archivedAt = null;
+    }
 
     const orders = await prisma.order.findMany({
       where: whereClause,

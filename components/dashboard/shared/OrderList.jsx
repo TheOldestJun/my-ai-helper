@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import OrderItemEditForm from './OrderItemEditForm';
 import { useOrders } from '../../../hooks/useApi';
-import { useApproveOrder, useRejectOrder, useDeleteOrder, useDeleteOrderProduct } from '../../../hooks/useMutations';
+import { useApproveOrder, useRejectOrder, useDeleteOrder, useDeleteOrderProduct, useArchiveOrder } from '../../../hooks/useMutations';
 
 /**
  * OrderList - Компонент для отображения списка заявок
@@ -83,6 +83,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
   const rejectOrder = useRejectOrder();
   const deleteOrder = useDeleteOrder();
   const deleteOrderProduct = useDeleteOrderProduct();
+  const archiveOrder = useArchiveOrder();
   const [rejectModal, setRejectModal] = useState({ open: false, orderId: null, reason: '' });
   const [editModal, setEditModal] = useState({ open: false, item: null, orderId: null });
   const [cancelModal, setCancelModal] = useState({ open: false, itemId: null, orderId: null });
@@ -102,6 +103,18 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
 
   const hideTooltip = () => {
     setTooltip({ show: false, x: 0, y: 0, text: '' });
+  };
+
+  const handleArchiveOrder = (orderId) => {
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!user || !user.id) {
+      toast.error('Користувач не авторизований');
+      return;
+    }
+
+    archiveOrder.mutate({ orderId, userId: user.id });
   };
 
   const handleApprove = (orderId) => {
@@ -234,6 +247,19 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
                 className="text-sm text-destructive hover:text-destructive/80 font-medium"
               >
                 Видалити заявку
+              </button>
+            </div>
+          )}
+
+          {allowEdit && order.products && order.products.length > 0 && order.products.every(item => item.status === 'RECEIVED') && !order.archivedAt && (
+            <div className="mb-3">
+              <button
+                onClick={() => handleArchiveOrder(order.id)}
+                className="text-sm text-primary hover:text-primary/80 font-medium"
+                onMouseEnter={(e) => handleTooltip(e, 'Архівувати заявку')}
+                onMouseLeave={hideTooltip}
+              >
+                Архівувати заявку
               </button>
             </div>
           )}

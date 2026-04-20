@@ -105,6 +105,7 @@ model Order {
   rejectedBy     User?          @relation("OrderRejector", fields: [rejectedById], references: [id])
   rejectedAt     DateTime?
   rejectionReason String?
+  archivedAt     DateTime?
   products       OrderProduct[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt

@@ -605,3 +605,58 @@ export const useDeleteDish = () => {
     },
   });
 };
+
+/**
+ * Архивирует заявку
+ * Используется заявителем для закрытия заявки после получения всех товаров
+ * Только заявитель может архивировать свои заявки
+ * Заявка должна иметь статус RECEIVED для всех товаров
+ * 
+ * @param {object} params - { orderId: number, userId: number }
+ */
+export const useArchiveOrder = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ orderId, userId }) => {
+      const response = await fetch(`/api/orders/${orderId}/archive`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка при архівуванні заявки');
+      }
+      return response.json();
+    },
+    onMutate: async ({ orderId }) => {
+      await queryClient.cancelQueries(['orders']);
+      
+      const previousOrders = queryClient.getQueryData(['orders']);
+      
+      queryClient.setQueryData(['orders'], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          orders: old.orders.filter(o => o.id !== orderId),
+        };
+      });
+      
+      return { previousOrders };
+    },
+    onError: (error, variables, context) => {
+      queryClient.setQueryData(['orders'], context.previousOrders);
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      toast.success('Заявку успішно архівовано');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries(['archived-orders']);
+    },
+  });
+};
