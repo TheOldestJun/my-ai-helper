@@ -36,17 +36,14 @@ export async function PATCH(request, { params }) {
       const orderProduct = await prisma.orderProduct.update({
         where: { id: productId },
         data: {
-          approvedById: userId,
-          approvedAt: new Date(),
           status: 'APPROVED',
-        },
-        include: {
-          approvedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
+          statusChangedById: userId,
+          statusChangedAt: new Date(),
+          statusHistory: {
+            create: {
+              oldStatus: 'PENDING',
+              newStatus: 'APPROVED',
+              changedById: userId,
             },
           },
         },
@@ -69,18 +66,14 @@ export async function PATCH(request, { params }) {
       const orderProduct = await prisma.orderProduct.update({
         where: { id: productId },
         data: {
-          rejectedById: userId,
-          rejectedAt: new Date(),
-          rejectionReason,
           status: 'REJECTED',
-        },
-        include: {
-          rejectedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
+          statusChangedById: userId,
+          statusChangedAt: new Date(),
+          statusHistory: {
+            create: {
+              oldStatus: 'PENDING',
+              newStatus: 'REJECTED',
+              changedById: userId,
             },
           },
         },
@@ -216,9 +209,6 @@ export async function PUT(request, { params }) {
         quantity: parseFloat(quantity),
         unitId,
         notes: notes || null,
-        rejectedById: null,
-        rejectedAt: null,
-        rejectionReason: null,
       },
       include: {
         product: {
@@ -270,7 +260,7 @@ export async function DELETE(request, { params }) {
     }
 
     // Проверяем, что пункт не был одобрен (отклоненные можно удалять)
-    if (existingOrderProduct.approvedById && !existingOrderProduct.rejectedById) {
+    if (existingOrderProduct.status === 'APPROVED' || existingOrderProduct.status === 'ORDERED' || existingOrderProduct.status === 'PAID' || existingOrderProduct.status === 'IN_TRANSIT' || existingOrderProduct.status === 'RECEIVED') {
       return NextResponse.json(
         { error: 'Неможливо видалити погоджений пункт заявки' },
         { status: 400 }

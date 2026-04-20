@@ -17,10 +17,9 @@ export async function GET() {
   try {
     const approvedProducts = await prisma.orderProduct.findMany({
       where: {
-        approvedById: {
-          not: null,
+        status: {
+          in: ['APPROVED', 'ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED'],
         },
-        rejectedById: null,
       },
       include: {
         order: {
@@ -38,11 +37,11 @@ export async function GET() {
             name: true,
           },
         },
-        approvedBy: {
+        unit: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
+            symbol: true,
           },
         },
         statusChangedBy: {
@@ -52,29 +51,23 @@ export async function GET() {
             lastName: true,
           },
         },
-        unit: {
-          select: {
-            id: true,
-            name: true,
-            symbol: true,
-          },
+      },
+      orderBy: {
+        order: {
+          priority: 'desc',
         },
       },
-      orderBy: [
-        {
-          order: {
-            priority: 'desc',
-          },
-        },
-        {
-          order: {
-            createdAt: 'desc',
-          },
-        },
-      ],
     });
 
-    const formattedProducts = approvedProducts.map((item) => ({
+    // Дополнительная сортировка по createdAt в JavaScript
+    const sortedProducts = approvedProducts.sort((a, b) => {
+      const priorityOrder = { URGENT: 4, HIGH: 3, NORMAL: 2, LOW: 1 };
+      const priorityDiff = priorityOrder[b.order.priority] - priorityOrder[a.order.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      return new Date(b.order.createdAt) - new Date(a.order.createdAt);
+    });
+
+    const formattedProducts = sortedProducts.map((item) => ({
       id: item.id,
       orderId: item.orderId,
       orderNumber: item.order.number,
@@ -89,8 +82,6 @@ export async function GET() {
       unitSymbol: item.unit.symbol,
       status: item.status,
       notes: item.notes,
-      approvedBy: item.approvedBy,
-      approvedAt: item.approvedAt,
       statusChangedBy: item.statusChangedBy,
       statusChangedAt: item.statusChangedAt,
     }));

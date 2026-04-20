@@ -17,10 +17,6 @@ export async function GET() {
   try {
     const warehouseProducts = await prisma.orderProduct.findMany({
       where: {
-        approvedById: {
-          not: null,
-        },
-        rejectedById: null,
         status: {
           in: ['IN_TRANSIT', 'RECEIVED'],
         },
@@ -42,13 +38,6 @@ export async function GET() {
           select: {
             id: true,
             name: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
           },
         },
         statusChangedBy: {
@@ -88,8 +77,6 @@ export async function GET() {
       unitSymbol: item.unit.symbol,
       status: item.status,
       notes: item.notes,
-      approvedBy: item.approvedBy,
-      approvedAt: item.approvedAt,
       statusChangedBy: item.statusChangedBy,
       statusChangedAt: item.statusChangedAt,
     }));

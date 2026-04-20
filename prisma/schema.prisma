@@ -30,10 +30,6 @@ model User {
   lastName          String?
   roles             UserRole[]
   orders            Order[]
-  approvedOrders    Order[]        @relation("OrderApprover")
-  rejectedOrders    Order[]        @relation("OrderRejector")
-  approvedProducts  OrderProduct[]  @relation("ProductApprover")
-  rejectedProducts  OrderProduct[]  @relation("ProductRejector")
   statusChangedProducts OrderProduct[] @relation("StatusChanger")
   statusHistory     OrderStatusHistory[]
   orderHistory      OrderHistory[]
@@ -100,13 +96,6 @@ model Order {
   notes          String?
   createdById    String
   createdBy      User           @relation(fields: [createdById], references: [id])
-  approvedById   String?
-  approvedBy     User?          @relation("OrderApprover", fields: [approvedById], references: [id])
-  approvedAt     DateTime?
-  rejectedById   String?
-  rejectedBy     User?          @relation("OrderRejector", fields: [rejectedById], references: [id])
-  rejectedAt     DateTime?
-  rejectionReason String?
   archivedAt     DateTime?
   products       OrderProduct[]
   history        OrderHistory[]
@@ -124,13 +113,6 @@ model OrderProduct {
   unitId         String
   status         OrderStatus @default(PENDING)
   notes          String?
-  approvedById   String?
-  approvedBy     User?       @relation("ProductApprover", fields: [approvedById], references: [id])
-  approvedAt     DateTime?
-  rejectedById   String?
-  rejectedBy     User?       @relation("ProductRejector", fields: [rejectedById], references: [id])
-  rejectedAt     DateTime?
-  rejectionReason String?
   statusChangedById String?
   statusChangedBy User?       @relation("StatusChanger", fields: [statusChangedById], references: [id])
   statusChangedAt DateTime?

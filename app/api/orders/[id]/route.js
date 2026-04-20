@@ -36,22 +36,10 @@ export async function PATCH(request, { params }) {
       const order = await prisma.order.update({
         where: { id },
         data: {
-          approvedById: userId,
-          approvedAt: new Date(),
           history: {
             create: {
               action: 'APPROVED',
               changedById: userId,
-            },
-          },
-        },
-        include: {
-          approvedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
             },
           },
         },
@@ -74,24 +62,11 @@ export async function PATCH(request, { params }) {
       const order = await prisma.order.update({
         where: { id },
         data: {
-          rejectedById: userId,
-          rejectedAt: new Date(),
-          rejectionReason,
           history: {
             create: {
               action: 'REJECTED',
               changedById: userId,
               reason: rejectionReason,
-            },
-          },
-        },
-        include: {
-          rejectedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
             },
           },
         },
@@ -239,7 +214,14 @@ export async function DELETE(request, { params }) {
     }
 
     // Проверяем, что заявка не была одобрена (но можно удалять отклоненные)
-    if (existingOrder.approvedById && !existingOrder.rejectedById) {
+    const orderHistory = await prisma.orderHistory.findFirst({
+      where: {
+        orderId: id,
+        action: 'APPROVED',
+      },
+    });
+
+    if (orderHistory) {
       return NextResponse.json(
         { error: 'Неможливо видалити погоджену заявку' },
         { status: 400 }

@@ -57,11 +57,6 @@ export async function GET(request) {
         priority: true,
         notes: true,
         createdAt: true,
-        approvedById: true,
-        approvedAt: true,
-        rejectedById: true,
-        rejectedAt: true,
-        rejectionReason: true,
         createdBy: {
           select: {
             id: true,
@@ -75,18 +70,6 @@ export async function GET(request) {
             quantity: true,
             status: true,
             notes: true,
-            approvedById: true,
-            approvedAt: true,
-            approvedBy: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-              },
-            },
-            rejectedById: true,
-            rejectedAt: true,
-            rejectionReason: true,
             statusChangedBy: {
               select: {
                 id: true,
