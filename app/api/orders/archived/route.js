@@ -62,6 +62,20 @@ export async function GET(request) {
             email: true,
           },
         },
+        history: {
+          include: {
+            changedBy: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+          orderBy: {
+            changedAt: 'asc',
+          },
+        },
         products: {
           include: {
             product: {
@@ -75,6 +89,20 @@ export async function GET(request) {
                 id: true,
                 name: true,
                 symbol: true,
+              },
+            },
+            statusHistory: {
+              include: {
+                changedBy: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+              orderBy: {
+                changedAt: 'asc',
               },
             },
           },

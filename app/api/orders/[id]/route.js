@@ -38,6 +38,12 @@ export async function PATCH(request, { params }) {
         data: {
           approvedById: userId,
           approvedAt: new Date(),
+          history: {
+            create: {
+              action: 'APPROVED',
+              changedById: userId,
+            },
+          },
         },
         include: {
           approvedBy: {
@@ -71,6 +77,13 @@ export async function PATCH(request, { params }) {
           rejectedById: userId,
           rejectedAt: new Date(),
           rejectionReason,
+          history: {
+            create: {
+              action: 'REJECTED',
+              changedById: userId,
+              reason: rejectionReason,
+            },
+          },
         },
         include: {
           rejectedBy: {

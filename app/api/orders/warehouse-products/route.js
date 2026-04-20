@@ -24,6 +24,9 @@ export async function GET() {
         status: {
           in: ['IN_TRANSIT', 'RECEIVED'],
         },
+        order: {
+          archivedAt: null,
+        },
       },
       include: {
         order: {

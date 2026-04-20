@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Truck, CircleCheck, X } from 'lucide-react';
+import { Truck, CircleCheck, X, Package } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useWarehouseProducts } from '../../../hooks/useApi';
@@ -133,6 +133,7 @@ const WarehouseOrderList = () => {
   if (warehouseProducts.length === 0) {
     return (
       <div className="text-center py-12">
+        <Package className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         <p className="text-muted-foreground">Немає заявок для складу</p>
       </div>
     );

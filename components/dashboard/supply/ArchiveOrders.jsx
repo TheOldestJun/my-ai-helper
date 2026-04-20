@@ -67,6 +67,12 @@ const priorityColors = {
   URGENT: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
 };
 
+const orderActionLabels = {
+  APPROVED: 'Схвалено',
+  REJECTED: 'Відхилено',
+  ARCHIVED: 'Архівовано',
+};
+
 const ArchiveOrders = ({ userId }) => {
   const { data: archivedOrdersData, isLoading, error } = useArchivedOrders(userId);
 
@@ -81,6 +87,7 @@ const ArchiveOrders = ({ userId }) => {
     orderNotes: order.notes,
     archivedAt: order.archivedAt,
     createdBy: order.createdBy,
+    history: order.history || [],
     products: order.products.map((product) => ({
       id: product.id,
       productName: product.product.name,
@@ -89,6 +96,7 @@ const ArchiveOrders = ({ userId }) => {
       unitSymbol: product.unit.symbol,
       status: product.status,
       notes: product.notes,
+      statusHistory: product.statusHistory || [],
     })),
   }));
 
@@ -135,23 +143,55 @@ const ArchiveOrders = ({ userId }) => {
             <p className="text-sm text-muted-foreground mb-3">{order.orderNotes}</p>
           )}
 
+          {order.history && order.history.length > 0 && (
+            <div className="mb-3 p-3 bg-muted/50 rounded-lg">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Історія заявки:</p>
+              <div className="space-y-1 text-xs">
+                {order.history.map((history) => (
+                  <div key={history.id} className="text-muted-foreground">
+                    {new Date(history.changedAt).toLocaleString('uk-UA')}:{' '}
+                    {orderActionLabels[history.action] || history.action}{' '}
+                    {history.reason && `(${history.reason})`}{' '}
+                    ({history.changedBy?.firstName} {history.changedBy?.lastName})
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="border-t border-border pt-3">
             <p className="text-xs font-medium text-muted-foreground mb-2">Товари:</p>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {order.products.map((item) => (
-                <li key={item.id} className="flex items-center justify-between py-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{item.productName}</span>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-muted-foreground">{item.quantity} {item.unitSymbol}</span>
-                    {item.notes && (
-                      <span className="text-xs text-muted-foreground italic font-medium">({item.notes})</span>
-                    )}
+                <li key={item.id} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-foreground">{item.productName}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-muted-foreground">{item.quantity} {item.unitSymbol}</span>
+                      {item.notes && (
+                        <span className="text-xs text-muted-foreground italic font-medium">({item.notes})</span>
+                      )}
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]} flex items-center gap-1`}>
+                      {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
+                      {statusLabels[item.status]}
+                    </span>
                   </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded ${statusColors[item.status]} flex items-center gap-1`}>
-                    {React.createElement(statusIcons[item.status], { className: 'w-3 h-3' })}
-                    {statusLabels[item.status]}
-                  </span>
+                  {item.statusHistory && item.statusHistory.length > 0 && (
+                    <div className="mt-2 ml-2">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Історія змін:</p>
+                      <div className="space-y-1 text-xs">
+                        {item.statusHistory.map((history) => (
+                          <div key={history.id} className="text-muted-foreground">
+                            {new Date(history.changedAt).toLocaleString('uk-UA')}:{' '}
+                            {statusLabels[history.oldStatus]} → {statusLabels[history.newStatus]}{' '}
+                            ({history.changedBy?.firstName} {history.changedBy?.lastName})
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

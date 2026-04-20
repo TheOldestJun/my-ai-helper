@@ -215,6 +215,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
+        <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         <p className="text-muted-foreground">У вас поки немає замовлень</p>
       </div>
     );

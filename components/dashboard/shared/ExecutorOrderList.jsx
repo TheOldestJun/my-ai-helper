@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -149,6 +149,7 @@ const ExecutorOrderList = () => {
   if (approvedProducts.length === 0) {
     return (
       <div className="text-center py-12">
+        <ClipboardList className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         <p className="text-muted-foreground">Немає схвалених заявок для виконання</p>
       </div>
     );

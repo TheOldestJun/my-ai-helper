@@ -35,6 +35,8 @@ model User {
   approvedProducts  OrderProduct[]  @relation("ProductApprover")
   rejectedProducts  OrderProduct[]  @relation("ProductRejector")
   statusChangedProducts OrderProduct[] @relation("StatusChanger")
+  statusHistory     OrderStatusHistory[]
+  orderHistory      OrderHistory[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 }
@@ -107,6 +109,7 @@ model Order {
   rejectionReason String?
   archivedAt     DateTime?
   products       OrderProduct[]
+  history        OrderHistory[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }
@@ -135,6 +138,35 @@ model OrderProduct {
   createdAt      DateTime    @default(now())
 
   @@unique([orderId, productId, unitId])
+  statusHistory OrderStatusHistory[]
+}
+
+model OrderStatusHistory {
+  id          String      @id @default(cuid())
+  orderProductId String
+  oldStatus   OrderStatus
+  newStatus   OrderStatus
+  changedById String
+  changedBy   User        @relation(fields: [changedById], references: [id])
+  changedAt   DateTime    @default(now())
+  orderProduct OrderProduct @relation(fields: [orderProductId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+
+  @@index([orderProductId])
+}
+
+model OrderHistory {
+  id          String      @id @default(cuid())
+  orderId     String
+  action      String      // 'APPROVED', 'REJECTED', 'ARCHIVED'
+  changedById String
+  changedBy   User        @relation(fields: [changedById], references: [id])
+  changedAt   DateTime    @default(now())
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reason      String?     // For rejection
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
 }
 
 model Dish {

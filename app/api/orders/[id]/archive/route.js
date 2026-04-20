@@ -81,6 +81,12 @@ export async function PATCH(request, { params }) {
       where: { id: orderId },
       data: {
         archivedAt: new Date(),
+        history: {
+          create: {
+            action: 'ARCHIVED',
+            changedById: userId,
+          },
+        },
       },
     });
 

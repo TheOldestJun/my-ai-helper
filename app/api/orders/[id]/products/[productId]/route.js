@@ -130,12 +130,27 @@ export async function PATCH(request, { params }) {
         }
       }
 
+      // Получаем текущий статус для записи в историю
+      const currentOrderProduct = await prisma.orderProduct.findUnique({
+        where: { id: productId },
+        select: { status: true },
+      });
+
+      const oldStatus = currentOrderProduct?.status || 'PENDING';
+
       const orderProduct = await prisma.orderProduct.update({
         where: { id: productId },
         data: {
           status,
           statusChangedById: userId,
           statusChangedAt: new Date(),
+          statusHistory: {
+            create: {
+              oldStatus,
+              newStatus: status,
+              changedById: userId,
+            },
+          },
         },
         include: {
           product: {

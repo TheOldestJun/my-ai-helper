@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { FileText } from 'lucide-react';
 
 import { useOrders } from '../../../hooks/useApi';
 import { useApproveProduct, useRejectProduct } from '../../../hooks/useMutations';
@@ -137,6 +138,7 @@ const DirectorateOrderList = () => {
   if (allProducts.length === 0) {
     return (
       <div className="text-center py-12">
+        <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         <p className="text-muted-foreground">Немає пунктів заявок для розгляду</p>
       </div>
     );

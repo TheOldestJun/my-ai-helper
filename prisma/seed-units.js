@@ -27,7 +27,6 @@ const units = [
   { name: 'Флакон', symbol: 'ФЛ', description: 'Кількість флаконів' },
   { name: 'Каністра', symbol: 'КАН', description: 'Кількість каністр' },
   { name: 'Відро', symbol: 'ВІД', description: 'Кількість відер' },
-  { name: 'Серветка', symbol: 'СЕРВ', description: 'Кількість серветок' },
   { name: 'Пара', symbol: 'ПАР', description: 'Кількість пар' },
   { name: 'Комплект', symbol: 'КОМПЛ', description: 'Кількість комплектів' },
   { name: 'Набір', symbol: 'НАБ', description: 'Кількість наборів' },
@@ -36,11 +35,6 @@ const units = [
   { name: 'Касета', symbol: 'КАС', description: 'Кількість касет' },
   { name: 'Картридж', symbol: 'КАРТ', description: 'Кількість картриджів' },
   { name: 'Тонна', symbol: 'Т', description: 'Маса в тоннах' },
-  { name: 'Центнер', symbol: 'Ц', description: 'Маса в центнерах' },
-  { name: 'Кіловат', symbol: 'КВТ', description: 'Потужність в кіловатах' },
-  { name: 'Кіловат-година', symbol: 'КВТ·ГОД', description: 'Енергія в кіловат-годинах' },
-  { name: 'Гігакалорія', symbol: 'ГКАЛ', description: 'Теплова енергія' },
-  { name: 'Кубометр', symbol: 'КУБ.М', description: 'Об\'єм газу або рідини' },
 ];
 
 async function main() {
