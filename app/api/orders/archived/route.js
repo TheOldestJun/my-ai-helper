@@ -14,6 +14,8 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
 
     if (!userId) {
       return NextResponse.json(
@@ -37,7 +39,7 @@ export async function GET(request) {
     const hasSupplyRole = user?.roles?.some(r => r.role.name === 'SUPPLY');
     if (!hasSupplyRole) {
       return NextResponse.json(
-        { error: 'Тільки снабження може переглядати архівні заявки' },
+        { error: 'Тільки снабжение може переглядати архівні заявки' },
         { status: 403 }
       );
     }
@@ -46,74 +48,96 @@ export async function GET(request) {
     const threeYearsAgo = new Date();
     threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
 
-    const archivedOrders = await prisma.order.findMany({
-      where: {
-        archivedAt: {
-          not: null,
-          gte: threeYearsAgo,
-        },
-      },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
+    const skip = (page - 1) * limit;
+
+    const [archivedOrders, totalCount] = await Promise.all([
+      prisma.order.findMany({
+        where: {
+          archivedAt: {
+            not: null,
+            gte: threeYearsAgo,
           },
         },
-        history: {
-          include: {
-            changedBy: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-              },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
             },
           },
-          orderBy: {
-            changedAt: 'asc',
-          },
-        },
-        products: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            unit: {
-              select: {
-                id: true,
-                name: true,
-                symbol: true,
-              },
-            },
-            statusHistory: {
-              include: {
-                changedBy: {
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                  },
+          history: {
+            include: {
+              changedBy: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
                 },
               },
-              orderBy: {
-                changedAt: 'asc',
+            },
+            orderBy: {
+              changedAt: 'asc',
+            },
+          },
+          products: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              unit: {
+                select: {
+                  id: true,
+                  name: true,
+                  symbol: true,
+                },
+              },
+              statusHistory: {
+                include: {
+                  changedBy: {
+                    select: {
+                      id: true,
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+                orderBy: {
+                  changedAt: 'asc',
+                },
               },
             },
           },
         },
-      },
-      orderBy: {
-        archivedAt: 'desc',
-      },
-    });
+        orderBy: {
+          archivedAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.order.count({
+        where: {
+          archivedAt: {
+            not: null,
+            gte: threeYearsAgo,
+          },
+        },
+      }),
+    ]);
 
-    return NextResponse.json({ orders: archivedOrders }, { status: 200 });
+    return NextResponse.json({
+      orders: archivedOrders,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    }, { status: 200 });
   } catch (error) {
     console.error('Помилка при отриманні архівних заявок:', error);
     return NextResponse.json(

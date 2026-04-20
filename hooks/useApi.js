@@ -87,6 +87,7 @@ export const useDishes = () => {
       }
       return response.json();
     },
+    staleTime: 10 * 60 * 1000, // 10 минут - статические данные редко меняются
   });
 };
 
@@ -108,6 +109,7 @@ export const useProducts = () => {
       }
       return response.json();
     },
+    staleTime: 10 * 60 * 1000, // 10 минут - статические данные редко меняются
   });
 };
 
@@ -127,6 +129,7 @@ export const useUnits = () => {
       }
       return response.json();
     },
+    staleTime: 10 * 60 * 1000, // 10 минут - статические данные редко меняются
   });
 };
 
@@ -148,6 +151,7 @@ export const useUsers = () => {
       }
       return response.json();
     },
+    staleTime: 5 * 60 * 1000, // 5 минут - пользователи меняются реже чем заявки
   });
 };
 
