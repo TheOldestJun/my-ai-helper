@@ -157,7 +157,17 @@ model OrderHistory {
 model Dish {
   id        String   @id @default(cuid())
   name      String   @unique
+  type      DishType @default(SOUP)
   createdAt DateTime @default(now())
+}
+
+enum DishType {
+  SOUP
+  GARNISH
+  MEAT
+  SALAD
+  BAKERY
+  DRINK
 }
 
 enum OrderStatus {

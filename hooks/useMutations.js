@@ -525,10 +525,10 @@ export const useUpdateOrder = () => {
 // ==================== DISH MUTATIONS ====================
 
 /**
- * Создает новую страву
+ * useCreateDish - Создает новую страву
  * Используется в MenuPlanner при создании стравы из autocomplete
  * 
- * @param {object} dishData - { name: string }
+ * @param {object} dishData - { name: string, type: string }
  */
 export const useCreateDish = () => {
   const queryClient = useQueryClient();

@@ -9,6 +9,7 @@ import prisma from '@/prisma';
  * 
  * POST тело запроса:
  * - name: Название стравы
+ * - type: Тип стравы (SOUP, GARNISH, MEAT, SALAD, BAKERY, DRINK)
  */
 
 // GET /api/dishes - получить список блюд
@@ -18,6 +19,7 @@ export async function GET() {
       select: {
         id: true,
         name: true,
+        type: true,
         createdAt: true,
       },
       orderBy: {
@@ -39,7 +41,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name } = body;
+    const { name, type } = body;
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -70,10 +72,12 @@ export async function POST(request) {
     const dish = await prisma.dish.create({
       data: {
         name: normalizedName,
+        type: type || 'SOUP',
       },
       select: {
         id: true,
         name: true,
+        type: true,
         createdAt: true,
       },
     });
