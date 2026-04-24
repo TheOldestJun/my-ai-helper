@@ -101,26 +101,36 @@ export async function PATCH(request, { params }) {
         );
       }
 
-      // Проверка: статус RECEIVED может устанавливать только склад
-      if (status === 'RECEIVED') {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          include: {
-            roles: {
-              include: {
-                role: true,
-              },
+      // Получаем роль пользователя для проверки прав
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          roles: {
+            include: {
+              role: true,
             },
           },
-        });
+        },
+      });
 
-        const hasWarehouseRole = user?.roles?.some(r => r.role.name === 'WAREHOUSE');
-        if (!hasWarehouseRole) {
-          return NextResponse.json(
-            { error: 'Статус "Отримано" може встановлювати тільки склад' },
-            { status: 403 }
-          );
-        }
+      const userRoles = user?.roles?.map(r => r.role.name) || [];
+      const hasSupplyRole = userRoles.includes('SUPPLY');
+      const hasWarehouseRole = userRoles.includes('WAREHOUSE');
+
+      // Проверка: снабжение может менять статус только до IN_TRANSIT (ORDERED, PAID, IN_TRANSIT)
+      if (hasSupplyRole && status === 'RECEIVED') {
+        return NextResponse.json(
+          { error: 'Снабжение може змінювати статус тільки до "В дорозі"' },
+          { status: 403 }
+        );
+      }
+
+      // Проверка: статус RECEIVED может устанавливать только склад
+      if (status === 'RECEIVED' && !hasWarehouseRole) {
+        return NextResponse.json(
+          { error: 'Статус "Отримано" може встановлювати тільки склад' },
+          { status: 403 }
+        );
       }
 
       // Получаем текущий статус для записи в историю

@@ -79,6 +79,20 @@ const ExecutorOrderList = () => {
 
   const approvedProducts = approvedProductsData?.products || [];
 
+  // Получаем роль текущего пользователя
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userRoles = user?.roles?.map(r => r.name) || [];
+  const isSupply = userRoles.includes('SUPPLY');
+  const isWarehouse = userRoles.includes('WAREHOUSE');
+
+  // Определяем доступные статусы в зависимости от роли
+  const availableStatuses = isSupply 
+    ? ['ORDERED', 'PAID', 'IN_TRANSIT']  // Снабжение может менять только до IN_TRANSIT
+    : isWarehouse
+    ? ['IN_TRANSIT', 'RECEIVED']  // Склад может менять IN_TRANSIT -> RECEIVED
+    : ['ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED'];  // Fallback
+
   const handleStatusChange = (orderId, productId, newStatus) => {
     const storedUser = localStorage.getItem('user');
     const user = storedUser ? JSON.parse(storedUser) : null;
@@ -154,8 +168,6 @@ const ExecutorOrderList = () => {
       </div>
     );
   }
-
-  const availableStatuses = ['APPROVED', 'ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED'];
 
   return (
     <div className="space-y-4">

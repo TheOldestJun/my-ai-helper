@@ -114,17 +114,19 @@ const DirectorateOrderList = () => {
     setRejectModal({ open: false, productId: null, orderId: null, reason: '' });
   };
 
-  // Flatten all products from all orders into a single list
+  // Flatten all products from all orders into a single list, filtering only PENDING items
   const allProducts = orders.flatMap(order =>
-    order.products.map(product => ({
-      ...product,
-      orderNumber: order.number,
-      orderPriority: order.priority,
-      orderNotes: order.notes,
-      orderCreatedAt: order.createdAt,
-      orderId: order.id,
-      createdBy: order.createdBy,
-    }))
+    order.products
+      .filter(product => product.status === 'PENDING')
+      .map(product => ({
+        ...product,
+        orderNumber: order.number,
+        orderPriority: order.priority,
+        orderNotes: order.notes,
+        orderCreatedAt: order.createdAt,
+        orderId: order.id,
+        createdBy: order.createdBy,
+      }))
   );
 
   if (loading) {

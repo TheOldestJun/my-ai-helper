@@ -329,7 +329,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
       {/* Custom Tooltip */}
       {tooltip.show && (
         <div
-          className="fixed bg-foreground text-background px-2 py-1 text-xs rounded shadow-lg pointer-events-none z-50"
+          className="fixed bg-foreground text-background px-2 py-1 text-xs rounded shadow-lg pointer-events-none z-[9999]"
           style={{
             left: `${tooltip.x}px`,
             top: `${tooltip.y}px`,

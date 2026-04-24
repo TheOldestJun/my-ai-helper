@@ -12,12 +12,14 @@
 
 import { useState } from 'react';
 import DirectorateOrderList from './DirectorateOrderList';
+import DirectorateOrderSummaryTable from './DirectorateOrderSummaryTable';
 
 const DirectorateDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 
   const tabs = [
     { id: 'orders', label: 'Заявки на погодження' },
+    { id: 'summary', label: 'Огляд заявок' },
   ];
 
   return (
@@ -45,6 +47,11 @@ const DirectorateDashboard = () => {
 
       {/* Содержимое вкладок */}
       <div className="py-2">
+        {activeTab === 'summary' && (
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <DirectorateOrderSummaryTable />
+          </div>
+        )}
         {activeTab === 'orders' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <DirectorateOrderList />

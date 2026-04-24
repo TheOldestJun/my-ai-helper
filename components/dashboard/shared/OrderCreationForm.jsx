@@ -67,9 +67,23 @@ const OrderCreationForm = () => {
   const handleItemChange = (index, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      items: prev.items.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      ),
+      items: prev.items.map((item, i) => {
+        if (i === index) {
+          const newItem = { ...item, [field]: value };
+          
+          // Если выбран товар, автоматически выбираем его первую единицу измерения
+          if (field === 'productId' && value) {
+            const selectedProduct = products.find(p => p.id === value);
+            if (selectedProduct && selectedProduct.units && selectedProduct.units.length > 0) {
+              // Автоматически выбираем первую единицу товара
+              newItem.unitId = selectedProduct.units[0].id;
+            }
+          }
+          
+          return newItem;
+        }
+        return item;
+      }),
     }));
   };
 
