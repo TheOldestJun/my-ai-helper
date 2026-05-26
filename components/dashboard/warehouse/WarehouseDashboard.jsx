@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import WarehouseOrderList from '../shared/WarehouseOrderList';
+import ArchiveOrders from '../shared/ArchiveOrders';
 
 /**
  * WarehouseDashboard - Дашборд для складу
@@ -15,6 +16,11 @@ import WarehouseOrderList from '../shared/WarehouseOrderList';
  */
 const WarehouseDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
+
+  // Получение ID текущего пользователя
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userId = user?.id;
 
   return (
     <div className="space-y-6">
@@ -63,6 +69,16 @@ const WarehouseDashboard = () => {
           >
             Залишки
           </button>
+          <button
+            onClick={() => setActiveTab('archive')}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'archive'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+            }`}
+          >
+            Архів
+          </button>
         </nav>
       </div>
 
@@ -89,6 +105,12 @@ const WarehouseDashboard = () => {
         {activeTab === 'stock' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <p className="text-muted-foreground">Перегляд залишків на складі</p>
+          </div>
+        )}
+
+        {activeTab === 'archive' && (
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <ArchiveOrders userId={userId} />
           </div>
         )}
       </div>

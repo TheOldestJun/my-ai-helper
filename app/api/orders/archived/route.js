@@ -6,8 +6,8 @@ import { NextResponse } from 'next/server';
  * 
  * GET /api/orders/archived - Получение списка архивных заявок
  * 
- * Используется снабжением для просмотра архивных заявок.
- * Только снабжение может видеть архивные заявки.
+ * Доступен для ролей: SUPPLY, DIRECTORATE, WAREHOUSE, APPLICANT.
+ * Заявитель видит только свои архивные заявки, остальные — все.
  * Архивные заявки хранятся не старше 3 лет.
  */
 export async function GET(request) {
@@ -24,7 +24,7 @@ export async function GET(request) {
       );
     }
 
-    // Проверка прав: только снабжение может видеть архивные заявки
+    // Проверка прав: архив доступен для SUPPLY, DIRECTORATE, WAREHOUSE, APPLICANT
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -36,13 +36,16 @@ export async function GET(request) {
       },
     });
 
-    const hasSupplyRole = user?.roles?.some(r => r.role.name === 'SUPPLY');
-    if (!hasSupplyRole) {
+    const userRoleNames = user?.roles?.map(r => r.role.name) || [];
+    const hasAccess = userRoleNames.some(r => ['SUPPLY', 'DIRECTORATE', 'WAREHOUSE', 'APPLICANT'].includes(r));
+    if (!hasAccess) {
       return NextResponse.json(
-        { error: 'Тільки снабжение може переглядати архівні заявки' },
+        { error: 'Доступ заборонено' },
         { status: 403 }
       );
     }
+
+    const isApplicant = userRoleNames.includes('APPLICANT');
 
     // Получение архивных заявок не старше 3 лет
     const threeYearsAgo = new Date();
@@ -57,6 +60,7 @@ export async function GET(request) {
             not: null,
             gte: threeYearsAgo,
           },
+          ...(isApplicant ? { createdById: userId } : {}),
         },
         include: {
           createdBy: {
@@ -125,6 +129,7 @@ export async function GET(request) {
             not: null,
             gte: threeYearsAgo,
           },
+          ...(isApplicant ? { createdById: userId } : {}),
         },
       }),
     ]);

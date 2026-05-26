@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ExecutorOrderList from '../shared/ExecutorOrderList';
-import ArchiveOrders from './ArchiveOrders';
+import ArchiveOrders from '../shared/ArchiveOrders';
 
 /**
  * SupplyDashboard - Дашборд для снабжения

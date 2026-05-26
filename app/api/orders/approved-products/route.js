@@ -18,7 +18,7 @@ export async function GET() {
     const approvedProducts = await prisma.orderProduct.findMany({
       where: {
         status: {
-          in: ['APPROVED', 'ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED'],
+          in: ['APPROVED', 'ORDERED', 'PAID', 'IN_TRANSIT'],
         },
       },
       include: {

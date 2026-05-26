@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import OrderList from '../shared/OrderList';
 import OrderCreationForm from '../shared/OrderCreationForm';
+import ArchiveOrders from '../shared/ArchiveOrders';
 
 /**
  * ApplicantDashboard - Дашборд для заявителей
@@ -22,9 +23,15 @@ import OrderCreationForm from '../shared/OrderCreationForm';
 const ApplicantDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 
+  // Получение ID текущего пользователя
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userId = user?.id;
+
   const tabs = [
     { id: 'orders', label: 'Мої замовлення' },
     { id: 'new', label: 'Нове замовлення' },
+    { id: 'archive', label: 'Архів' },
   ];
 
   return (
@@ -61,6 +68,12 @@ const ApplicantDashboard = () => {
         {activeTab === 'new' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <OrderCreationForm />
+          </div>
+        )}
+
+        {activeTab === 'archive' && (
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <ArchiveOrders userId={userId} />
           </div>
         )}
       </div>

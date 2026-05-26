@@ -13,13 +13,20 @@
 import { useState } from 'react';
 import DirectorateOrderList from './DirectorateOrderList';
 import DirectorateOrderSummaryTable from './DirectorateOrderSummaryTable';
+import ArchiveOrders from '../shared/ArchiveOrders';
 
 const DirectorateDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
 
+  // Получение ID текущего пользователя
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userId = user?.id;
+
   const tabs = [
     { id: 'orders', label: 'Заявки на погодження' },
     { id: 'summary', label: 'Огляд заявок' },
+    { id: 'archive', label: 'Архів' },
   ];
 
   return (
@@ -55,6 +62,11 @@ const DirectorateDashboard = () => {
         {activeTab === 'orders' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <DirectorateOrderList />
+          </div>
+        )}
+        {activeTab === 'archive' && (
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <ArchiveOrders userId={userId} />
           </div>
         )}
       </div>
