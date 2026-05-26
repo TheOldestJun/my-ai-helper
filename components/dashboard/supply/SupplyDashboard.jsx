@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ExecutorOrderList from '../shared/ExecutorOrderList';
 import ArchiveOrders from '../shared/ArchiveOrders';
+import Passes from './Passes';
 
 /**
  * SupplyDashboard - Дашборд для снабжения
@@ -70,6 +71,16 @@ const SupplyDashboard = () => {
           >
             Архів
           </button>
+          <button
+            onClick={() => setActiveTab('passes')}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'passes'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+            }`}
+          >
+            Перепустки
+          </button>
         </nav>
       </div>
 
@@ -96,6 +107,12 @@ const SupplyDashboard = () => {
         {activeTab === 'archive' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
             <ArchiveOrders userId={userId} />
+          </div>
+        )}
+
+        {activeTab === 'passes' && (
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+            <Passes />
           </div>
         )}
       </div>
