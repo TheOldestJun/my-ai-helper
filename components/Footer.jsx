@@ -32,6 +32,9 @@ const Footer = () => {
 
           {/* Links */}
           <nav className="flex items-center gap-4 text-sm">
+            <Link href="/help" className="text-slate-400 hover:text-white transition-colors duration-200">
+              Допомога
+            </Link>
             <Link href="#" className="text-slate-400 hover:text-white transition-colors duration-200">
               Контакти
             </Link>

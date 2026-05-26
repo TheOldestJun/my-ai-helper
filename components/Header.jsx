@@ -25,7 +25,7 @@ const Header = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const navLinks = [
-    { href: '#', label: 'Допомога' },
+    { href: '/help', label: 'Допомога' },
   ];
 
   return (
