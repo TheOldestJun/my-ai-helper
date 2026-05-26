@@ -3,25 +3,11 @@ import { Toaster } from "sonner";
 
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import LayoutSplash from "../components/LayoutSplash";
 import { ThemeProvider } from "../components/ThemeProvider";
 import Providers from "./Providers.js";
 
 import "./globals.css";
-
-/**
- * RootLayout - Корневой макет приложения
- * Оборачивает все приложение в провайдеры и базовую структуру
- * 
- * Провайдеры:
- * - Providers: TanStack Query для кеширования данных
- * - ThemeProvider: Темная/светлая тема
- * - Toaster: Уведомления (sonner)
- * 
- * Структура:
- * - Header: Шапка сайта с навигацией
- * - Main: Основное содержимое (страницы)
- * - Footer: Подвал сайта
- */
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,16 +31,19 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-900" suppressHydrationWarning>
-        <Providers>
-          <ThemeProvider>
-            <Header />
-            <main className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              {children}
-            </main>
-            <Footer />
-            <Toaster position="top-right" richColors />
-          </ThemeProvider>
-        </Providers>
+        <LayoutSplash />
+        <div id="layout-root" style={{ display: 'none' }}>
+          <Providers>
+            <ThemeProvider>
+              <Header />
+              <main className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {children}
+              </main>
+              <Footer />
+              <Toaster position="top-right" richColors />
+            </ThemeProvider>
+          </Providers>
+        </div>
       </body>
     </html>
   );

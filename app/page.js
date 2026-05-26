@@ -1,4 +1,3 @@
-// app/page.js
 import LoginForm from '@/components/LoginForm';
 
 const Home = () => {
