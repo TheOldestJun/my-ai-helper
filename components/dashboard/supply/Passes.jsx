@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Truck, FileText, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import ExcelJS from 'exceljs';
 
 import Autocomplete from '@/components/Autocomplete';
 import { useProducts, useUnits } from '../../../hooks/useApi';
@@ -97,13 +98,60 @@ const Passes = () => {
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const filledItems = items.filter(isItemFilled);
     if (filledItems.length === 0) {
       toast.error('Додайте хоча б один товар');
       return;
     }
-    toast.success('Перепустку збережено');
+    if (!startDate) {
+      toast.error('Оберіть дату початку дії');
+      return;
+    }
+    if (!selectedType) {
+      toast.error('Оберіть тип перепустки');
+      return;
+    }
+
+    const sheetMap = { import: 'IN', export: 'OUT', import_with_export: 'IN_OUT' };
+    const sheetName = sheetMap[selectedType];
+
+    const start = new Date(startDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+
+    const fmt = (d) => d.toLocaleDateString('uk-UA', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+    });
+
+    try {
+      const resp = await fetch('/xls/IN_OUT.xlsx');
+      const buf = await resp.arrayBuffer();
+
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(buf);
+
+      let ws = wb.getWorksheet(sheetName);
+      if (!ws) {
+        ws = wb.addWorksheet(sheetName);
+      }
+
+      ws.getCell('G56').value = fmt(start);
+      ws.getCell('G57').value = fmt(end);
+
+      const outBuf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([outBuf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'IN_OUT.xlsx';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success('Перепустку збережено');
+    } catch {
+      toast.error('Помилка при збереженні файлу');
+    }
   };
 
   return (
