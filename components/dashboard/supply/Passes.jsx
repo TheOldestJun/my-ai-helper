@@ -5,6 +5,9 @@ import { Truck, FileText, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import ExcelJS from 'exceljs';
+import DatePicker from 'react-datepicker';
+import { uk } from 'date-fns/locale/uk';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import Autocomplete from '@/components/Autocomplete';
 import { useProducts, useUnits } from '../../../hooks/useApi';
@@ -30,7 +33,7 @@ const Passes = () => {
   const units = unitsData?.units || [];
 
   const [selectedType, setSelectedType] = useState(null);
-  const [startDate, setStartDate] = useState('');
+  const [startDate, setStartDate] = useState(null);
   const [items, setItems] = useState([{ productId: '', unitId: '', quantity: '' }]);
 
   const handleTypeChange = (typeId) => {
@@ -117,7 +120,7 @@ const Passes = () => {
     const sheetMap = { import: 'IN', export: 'OUT', import_with_export: 'IN_OUT' };
     const sheetName = sheetMap[selectedType];
 
-    const start = new Date(startDate);
+    const start = startDate;
     const end = new Date(start);
     end.setDate(end.getDate() + 7);
 
@@ -184,10 +187,13 @@ const Passes = () => {
       <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
         <div className="mb-4">
           <label className="block text-sm font-medium text-foreground mb-1">Дата початку дії</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            locale={uk}
+            dateFormat="dd.MM.yyyy"
+            placeholderText="Оберіть дату"
+            popperPlacement="bottom-start"
             className="w-full max-w-xs px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
           />
         </div>
