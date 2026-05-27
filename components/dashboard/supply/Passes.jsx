@@ -9,6 +9,7 @@ import ExcelJS from 'exceljs';
 import Autocomplete from '@/components/Autocomplete';
 import { useProducts, useUnits } from '../../../hooks/useApi';
 import { useCreateProduct, useCreateUnit } from '../../../hooks/useMutations';
+import { numToWordsUpper } from '@/lib/numToWords';
 
 const passTypes = [
   { id: 'import', label: 'Ввіз' },
@@ -131,6 +132,13 @@ const Passes = () => {
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(buf);
 
+      const allSheetNames = ['IN', 'OUT', 'IN_OUT'];
+      allSheetNames.forEach((name) => {
+        if (name !== sheetName) {
+          const s = wb.getWorksheet(name);
+          if (s) wb.removeWorksheet(s.id);
+        }
+      });
       let ws = wb.getWorksheet(sheetName);
       if (!ws) {
         ws = wb.addWorksheet(sheetName);
@@ -148,6 +156,7 @@ const Passes = () => {
         ws.getCell(`B${row}`).value = product ? product.name : '';
         ws.getCell(`D${row}`).value = unit ? unit.symbol : '';
         ws.getCell(`E${row}`).value = item.quantity ? Number(item.quantity) : '';
+        ws.getCell(`F${row}`).value = item.quantity ? numToWordsUpper(Number(item.quantity)) : '';
       });
 
       const outBuf = await wb.xlsx.writeBuffer();
