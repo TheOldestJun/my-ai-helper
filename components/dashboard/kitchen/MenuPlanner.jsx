@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 import Autocomplete from '@/components/Autocomplete';
+import DatePicker from '@/components/DatePicker';
 import { useDishes } from '../../../hooks/useApi';
 import { useCreateDish, useUpdateDish } from '../../../hooks/useMutations';
 
@@ -53,34 +54,20 @@ const MenuPlanner = () => {
   const { data: dishesData, isLoading: loading } = useDishes();
   const createDish = useCreateDish();
   const updateDish = useUpdateDish();
+  const createResolveRef = useRef(null);
   const [menu, setMenu] = useState({});
   const [priceInputs, setPriceInputs] = useState({});
+  const [createModal, setCreateModal] = useState({ open: false, name: '', mealTypeId: '', price: '' });
   const [selectedDays, setSelectedDays] = useState(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
   const [startDate, setStartDate] = useState(() => {
-    // Default to current week's Monday
     const now = new Date();
     const day = now.getDay();
     const diff = now.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(now.setDate(diff));
-    return monday.toISOString().split('T')[0];
+    return monday;
   });
 
   const dishes = dishesData?.dishes || [];
-
-  // Calculate dates for each day based on start date
-  const getDayDate = (dayId) => {
-    const dayOffsets = {
-      'monday': 0,
-      'tuesday': 1,
-      'wednesday': 2,
-      'thursday': 3,
-      'friday': 4,
-    };
-    const start = new Date(startDate);
-    const targetDate = new Date(start);
-    targetDate.setDate(start.getDate() + dayOffsets[dayId]);
-    return targetDate.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
-  };
 
   // Отримуємо страви для конкретного типу прийому їжі
   const getDishesForMealType = (mealTypeId) => {
@@ -96,8 +83,25 @@ const MenuPlanner = () => {
     return dishes.filter(dish => dish.type === dishType);
   };
 
-  // Фільтруємо дні тижня залежно від вибору
-  const visibleDays = daysOfWeek.filter((day) => selectedDays.includes(day.id));
+  // Дні тижня, що відображаються — починаючи з startDate за календарем
+  const visibleDays = useMemo(() => {
+    const dayIdFromIndex = { 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday' };
+    const dayLabels = { monday: 'Понеділок', tuesday: 'Вівторок', wednesday: 'Середа', thursday: 'Четвер', friday: "П'ятниця" };
+    const result = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startDate);
+      d.setDate(startDate.getDate() + i);
+      const dayId = dayIdFromIndex[d.getDay()];
+      if (dayId && selectedDays.includes(dayId)) {
+        result.push({
+          id: dayId,
+          label: dayLabels[dayId],
+          dateStr: d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }),
+        });
+      }
+    }
+    return result;
+  }, [startDate, selectedDays]);
 
   const toggleDay = (dayId) => {
     setSelectedDays((prev) =>
@@ -162,6 +166,14 @@ const MenuPlanner = () => {
   };
 
   const handleCreateDish = (dishName, mealTypeId) => {
+    setCreateModal({ open: true, name: dishName, mealTypeId, price: '' });
+    return new Promise((resolve) => {
+      createResolveRef.current = resolve;
+    });
+  };
+
+  const handleCreateDishConfirm = () => {
+    const { name, mealTypeId, price: priceStr } = createModal;
     const typeMapping = {
       'soup': 'SOUP',
       'garnish': 'GARNISH',
@@ -171,22 +183,26 @@ const MenuPlanner = () => {
       'drink': 'DRINK',
     };
     const dishType = typeMapping[mealTypeId];
-    
-    const priceStr = window.prompt('Введіть ціну страви (грн):', '0');
-    if (priceStr === null) return Promise.resolve(null);
     const price = parseFloat(priceStr);
     if (isNaN(price) || price < 0) {
       toast.error('Будь ласка, введіть коректну ціну');
-      return Promise.resolve(null);
+      return;
     }
-    
-    return createDish.mutateAsync({ name: dishName, type: dishType, price })
-      .then((data) => {
-        return data.dish.id;
-      })
-      .catch(() => {
-        return null;
-      });
+    setCreateModal((prev) => ({ ...prev, open: false }));
+    createDish.mutateAsync({ name, type: dishType, price }).then((data) => {
+      if (createResolveRef.current) {
+        createResolveRef.current(data.dish.id);
+        createResolveRef.current = null;
+      }
+    });
+  };
+
+  const handleCreateDishCancel = () => {
+    setCreateModal((prev) => ({ ...prev, open: false }));
+    if (createResolveRef.current) {
+      createResolveRef.current(null);
+      createResolveRef.current = null;
+    }
   };
 
   const handleSave = () => {
@@ -225,7 +241,7 @@ const MenuPlanner = () => {
         // Добавляем разрыв страницы перед каждым днем (кроме первого)
         const pageBreakStyle = dayIndex > 0 ? 'page-break-before: always;' : '';
         const dayEmoji = dayImages[day.id] || '🍽️';
-        const dayDate = getDayDate(day.id);
+        const dayDate = day.dateStr;
         
         htmlContent += `
           <div style="margin-bottom: 30px; ${pageBreakStyle}">
@@ -282,19 +298,6 @@ const MenuPlanner = () => {
           </div>
         `;
       });
-      
-      const grandTotal = visibleDays.reduce((sum, day) => {
-        return sum + mealTypes.reduce((s, meal) => {
-          const dishesList = menu[day.id]?.[meal.id] || [];
-          return s + dishesList.reduce((ss, id) => ss + getDishPrice(id), 0);
-        }, 0);
-      }, 0);
-      
-      htmlContent += `
-        <div style="margin-top: 30px; text-align: right; font-size: 24px; font-weight: bold; color: #0891B2; padding: 16px; border-top: 3px solid #0891B2;">
-          Загальна сума на тиждень: ${grandTotal.toFixed(2)}₴
-        </div>
-      `;
       
       element.innerHTML = htmlContent;
       document.body.appendChild(element);
@@ -372,12 +375,11 @@ const MenuPlanner = () => {
         <h3 className="text-lg font-semibold text-foreground">Меню на тиждень</h3>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-foreground">Початок тижня:</label>
-            <input
-              type="date"
+            <label className="text-sm text-foreground text-nowrap">Початок тижня:</label>
+            <DatePicker
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              onChange={(date) => setStartDate(date)}
+              className="w-auto"
             />
           </div>
           <div className="flex gap-2">
@@ -428,7 +430,8 @@ const MenuPlanner = () => {
                   key={day.id}
                   className="px-2 py-3 text-center text-sm font-semibold text-foreground bg-muted border border-border"
                 >
-                  {day.label}
+                  <div>{day.label}</div>
+                  <div className="text-xs font-normal text-muted-foreground">{day.dateStr}</div>
                 </th>
               ))}
             </tr>
@@ -502,6 +505,54 @@ const MenuPlanner = () => {
           </tbody>
         </table>
       </div>
+
+      {createModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card text-card-foreground rounded-xl shadow-lg max-w-md w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Нова страва</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Назва</label>
+                <input
+                  type="text"
+                  value={createModal.name}
+                  readOnly
+                  className="w-full px-3 py-2 text-sm border border-input bg-muted rounded-lg text-foreground"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Ціна (грн)</label>
+                <input
+                  type="number"
+                  value={createModal.price}
+                  onChange={(e) => setCreateModal((prev) => ({ ...prev, price: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                  min="0"
+                  step="0.5"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCreateDishConfirm();
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleCreateDishCancel}
+                className="flex-1 py-2 px-4 text-sm font-medium text-secondary-foreground bg-secondary rounded-lg hover:bg-secondary/80"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={handleCreateDishConfirm}
+                className="flex-1 py-2 px-4 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90"
+              >
+                Створити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

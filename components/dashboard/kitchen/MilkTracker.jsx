@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import DatePicker from '@/components/DatePicker';
 
 const MilkTracker = () => {
   const [records, setRecords] = useState([]);
@@ -81,15 +82,18 @@ const MilkTracker = () => {
         <h4 className="font-medium text-foreground">Новий запис</h4>
         
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">Дата</label>
-            <input
-              type="date"
-              value={newRecord.date}
-              onChange={(e) => setNewRecord({ ...newRecord, date: e.target.value })}
-              className="w-full px-3 py-2 text-sm border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
-            />
-          </div>
+          <DatePicker
+            label="Дата"
+            value={newRecord.date}
+            onChange={(date) =>
+              setNewRecord({
+                ...newRecord,
+                date: date
+                  ? date.toLocaleDateString('en-CA')
+                  : new Date().toLocaleDateString('en-CA'),
+              })
+            }
+          />
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Расход - молоко по чеку (л)</label>
             <input
