@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- BEGIN:workflow -->
 # Workflow
 
-- Для разработки: `npm run dev`
+- Для разработки: `npm run dev` (без `--webpack`)
 - Не запускать `npm run build` для проверки — только для продакшена
 - Dev-сервер запускать через detached node process (из-за ограничений окружения)
 <!-- END:workflow -->

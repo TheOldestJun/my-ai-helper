@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import Autocomplete from '@/components/Autocomplete';
 import { useDishes } from '../../../hooks/useApi';
-import { useCreateDish } from '../../../hooks/useMutations';
+import { useCreateDish, useUpdateDish } from '../../../hooks/useMutations';
 
 /**
  * MenuPlanner - Компонент для планирования меню на неделю
@@ -52,7 +52,9 @@ const MenuPlanner = () => {
   const queryClient = useQueryClient();
   const { data: dishesData, isLoading: loading } = useDishes();
   const createDish = useCreateDish();
+  const updateDish = useUpdateDish();
   const [menu, setMenu] = useState({});
+  const [priceInputs, setPriceInputs] = useState({});
   const [selectedDays, setSelectedDays] = useState(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
   const [startDate, setStartDate] = useState(() => {
     // Default to current week's Monday
@@ -131,19 +133,12 @@ const MenuPlanner = () => {
 
     setMenu((prev) => {
       const dayMenu = prev[day] || {};
-      const mealDishes = dayMenu[mealType] || [];
-      
-      // Перевіряємо чи страва вже додана
-      if (mealDishes.includes(dishId)) {
-        toast.info('Ця страва вже додана');
-        return prev;
-      }
 
       const newMenu = {
         ...prev,
         [day]: {
           ...dayMenu,
-          [mealType]: [...mealDishes, dishId],
+          [mealType]: [dishId],
         },
       };
       
@@ -177,7 +172,15 @@ const MenuPlanner = () => {
     };
     const dishType = typeMapping[mealTypeId];
     
-    return createDish.mutateAsync({ name: dishName, type: dishType })
+    const priceStr = window.prompt('Введіть ціну страви (грн):', '0');
+    if (priceStr === null) return Promise.resolve(null);
+    const price = parseFloat(priceStr);
+    if (isNaN(price) || price < 0) {
+      toast.error('Будь ласка, введіть коректну ціну');
+      return Promise.resolve(null);
+    }
+    
+    return createDish.mutateAsync({ name: dishName, type: dishType, price })
       .then((data) => {
         return data.dish.id;
       })
@@ -240,6 +243,7 @@ const MenuPlanner = () => {
                 <tr style="background: linear-gradient(135deg, #0891B2 0%, #22D3EE 100%); color: #FFFFFF;">
                   <th style="padding: 16px; text-align: left; border: 1px solid #0891B2; font-weight: bold; font-size: 20px;">Категорія</th>
                   <th style="padding: 16px; text-align: left; border: 1px solid #0891B2; font-weight: bold; font-size: 20px;">Страви</th>
+                  <th style="padding: 16px; text-align: center; border: 1px solid #0891B2; font-weight: bold; font-size: 20px; width: 120px;">Ціна</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,7 +251,8 @@ const MenuPlanner = () => {
         
         mealTypes.forEach((meal, index) => {
           const dishesList = menu[day.id]?.[meal.id] || [];
-          const dishNames = dishesList.map(id => getDishName(id)).join(' або ') || '-';
+          const dishNames = dishesList.map(id => getDishName(id))[0] || '-';
+          const totalPrice = dishesList.reduce((sum, id) => sum + getDishPrice(id), 0);
           const bgColor = index % 2 === 0 ? '#F8FAFC' : '#FFFFFF';
           const borderColor = index % 2 === 0 ? '#E2E8F0' : '#CBD5E1';
           
@@ -255,16 +260,41 @@ const MenuPlanner = () => {
             <tr style="background-color: ${bgColor}; color: #000000;">
               <td style="padding: 16px; border: 1px solid ${borderColor}; font-weight: bold; color: #0891B2; font-size: 18px;">${meal.label}</td>
               <td style="padding: 16px; border: 1px solid ${borderColor}; font-size: 18px;">${dishNames}</td>
+              <td style="padding: 16px; border: 1px solid ${borderColor}; font-size: 18px; text-align: center;">${totalPrice > 0 ? `${totalPrice.toFixed(2)}₴` : '-'}</td>
             </tr>
           `;
         });
         
+        const dayTotal = mealTypes.reduce((sum, meal) => {
+          const dishesList = menu[day.id]?.[meal.id] || [];
+          return sum + dishesList.reduce((s, id) => s + getDishPrice(id), 0);
+        }, 0);
+        
         htmlContent += `
               </tbody>
+              <tfoot>
+                <tr style="background-color: #F0FDFA; font-weight: bold;">
+                  <td style="padding: 16px; border: 1px solid #CBD5E1; font-size: 18px; text-align: right;" colspan="2">Загальна сума:</td>
+                  <td style="padding: 16px; border: 1px solid #CBD5E1; font-size: 18px; text-align: center; color: #0891B2;">${dayTotal > 0 ? `${dayTotal.toFixed(2)}₴` : '-'}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         `;
       });
+      
+      const grandTotal = visibleDays.reduce((sum, day) => {
+        return sum + mealTypes.reduce((s, meal) => {
+          const dishesList = menu[day.id]?.[meal.id] || [];
+          return s + dishesList.reduce((ss, id) => ss + getDishPrice(id), 0);
+        }, 0);
+      }, 0);
+      
+      htmlContent += `
+        <div style="margin-top: 30px; text-align: right; font-size: 24px; font-weight: bold; color: #0891B2; padding: 16px; border-top: 3px solid #0891B2;">
+          Загальна сума на тиждень: ${grandTotal.toFixed(2)}₴
+        </div>
+      `;
       
       element.innerHTML = htmlContent;
       document.body.appendChild(element);
@@ -299,6 +329,33 @@ const MenuPlanner = () => {
   const getDishName = (dishId) => {
     const dish = dishes.find((d) => d.id === dishId);
     return dish ? dish.name : 'Невідома страва';
+  };
+
+  const getDishPrice = (dishId) => {
+    const dish = dishes.find((d) => d.id === dishId);
+    return dish ? dish.price : 0;
+  };
+
+  const getPriceInput = (dishId) => {
+    if (dishId in priceInputs) return priceInputs[dishId];
+    return Number(getDishPrice(dishId)).toFixed(2);
+  };
+
+  const handlePriceChange = (dishId, value) => {
+    setPriceInputs((prev) => ({ ...prev, [dishId]: value }));
+  };
+
+  const handlePriceSave = (dishId) => {
+    const value = priceInputs[dishId];
+    if (value === undefined) return;
+    const price = parseFloat(value);
+    if (isNaN(price) || price < 0) return;
+    updateDish.mutate({ id: dishId, price });
+    setPriceInputs((prev) => {
+      const next = { ...prev };
+      delete next[dishId];
+      return next;
+    });
   };
 
   if (loading) {
@@ -387,50 +444,56 @@ const MenuPlanner = () => {
                     key={`${day.id}-${meal.id}`}
                     className="px-2 py-2 border border-border align-top min-w-[180px]"
                   >
-                    <div className="space-y-2">
-                      {/* Список страв */}
-                      <ul className="space-y-1">
-                        {(menu[day.id]?.[meal.id] || []).map((dishId) => (
-                          <li
-                            key={dishId}
-                            className="flex items-center justify-between bg-primary/10 px-2 py-1 rounded text-sm"
+                    <div className="flex items-center gap-1">
+                      <div className="flex-1 min-w-0">
+                        <Autocomplete
+                          key={`${day.id}-${meal.id}`}
+                          options={getDishesForMealType(meal.id)}
+                          value={menu[day.id]?.[meal.id]?.[0] || ''}
+                          onChange={(dishId) => {
+                            if (dishId) {
+                              handleAddDish(day.id, meal.id, dishId);
+                            }
+                          }}
+                          onCreate={async (name) => {
+                            const newDishId = await handleCreateDish(name, meal.id);
+                            if (newDishId) {
+                              handleAddDish(day.id, meal.id, newDishId);
+                            }
+                          }}
+                          creatable={true}
+                          createLabel={(search) => `Створити страву "${search}"`}
+                          placeholder="Обрати страву..."
+                          labelKey="name"
+                          valueKey="id"
+                          searchKeys={['name']}
+                          displayFormat={(d) => d.name}
+                          emptyMessage="Немає страв. Введіть назву для створення."
+                        />
+                      </div>
+                      {menu[day.id]?.[meal.id]?.[0] && (
+                        <>
+                          <input
+                            type="number"
+                            value={getPriceInput(menu[day.id][meal.id][0])}
+                            onChange={(e) => handlePriceChange(menu[day.id][meal.id][0], e.target.value)}
+                            onBlur={() => handlePriceSave(menu[day.id][meal.id][0])}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handlePriceSave(menu[day.id][meal.id][0]);
+                            }}
+                            className="w-20 text-sm px-2 py-2 border border-input rounded-lg bg-background text-center flex-shrink-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                            min="0"
+                            step="0.5"
+                          />
+                          <span className="text-xs text-muted-foreground flex-shrink-0">₴</span>
+                          <button
+                            onClick={() => handleRemoveDish(day.id, meal.id, menu[day.id][meal.id][0])}
+                            className="text-destructive hover:text-destructive/80 text-xs flex-shrink-0"
                           >
-                            <span className="text-foreground truncate">{getDishName(dishId)}</span>
-                            <button
-                              onClick={() => handleRemoveDish(day.id, meal.id, dishId)}
-                              className="text-destructive hover:text-destructive/80 text-xs ml-1 flex-shrink-0"
-                            >
-                              ×
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-
-                      {/* Autocomplete для додавання страви */}
-                      <Autocomplete
-                        key={`${day.id}-${meal.id}-${(menu[day.id]?.[meal.id] || []).length}`}
-                        options={getDishesForMealType(meal.id)}
-                        value=""
-                        onChange={(dishId) => {
-                          if (dishId) {
-                            handleAddDish(day.id, meal.id, dishId);
-                          }
-                        }}
-                        onCreate={async (name) => {
-                          const newDishId = await handleCreateDish(name, meal.id);
-                          if (newDishId) {
-                            handleAddDish(day.id, meal.id, newDishId);
-                          }
-                        }}
-                        creatable={true}
-                        createLabel={(search) => `Створити страву "${search}"`}
-                        placeholder="Додати страву..."
-                        labelKey="name"
-                        valueKey="id"
-                        searchKeys={['name']}
-                        displayFormat={(d) => d.name}
-                        emptyMessage="Немає страв. Введіть назву для створення."
-                      />
+                            ×
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 ))}

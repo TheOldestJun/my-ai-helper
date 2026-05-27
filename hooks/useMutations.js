@@ -553,6 +553,37 @@ export const useUpdateOrder = () => {
   });
 };
 
+/**
+ * useUpdateDish - Оновлює страву (ціну, назву)
+ */
+export const useUpdateDish = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...data }) => {
+      const response = await fetch(`/api/dishes/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.error || 'Помилка при оновленні страви');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success('Ціну страви оновлено');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['dishes']);
+    },
+  });
+};
+
 // ==================== DISH MUTATIONS ====================
 
 /**

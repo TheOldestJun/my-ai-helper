@@ -158,6 +158,7 @@ model Dish {
   id        String   @id @default(cuid())
   name      String   @unique
   type      DishType @default(SOUP)
+  price     Float    @default(0)
   createdAt DateTime @default(now())
 }
 

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Dish` ADD COLUMN `price` DOUBLE NOT NULL DEFAULT 0;

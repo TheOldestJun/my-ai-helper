@@ -48,6 +48,7 @@ const Autocomplete = ({
 }) => {
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownUp, setDropdownUp] = useState(false);
   const containerRef = useRef(null);
 
   // Закрывать dropdown при клике вне компонента
@@ -81,6 +82,14 @@ const Autocomplete = ({
 
   const canCreate = creatable && search && getFilteredOptions().length === 0;
 
+  const calcDropdownDirection = () => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const estimatedHeight = Math.min(192, options.length * 42 + 50);
+    setDropdownUp(spaceBelow < estimatedHeight && rect.top > spaceBelow);
+  };
+
   const handleSelect = (option) => {
     onChange(option[valueKey]);
     setIsOpen(false);
@@ -97,17 +106,26 @@ const Autocomplete = ({
 
   const handleInputChange = (e) => {
     setSearch(e.target.value);
-    if (!isOpen) setIsOpen(true);
+    if (!isOpen) {
+      setIsOpen(true);
+      calcDropdownDirection();
+    }
   };
 
   const handleInputFocus = () => {
     setIsOpen(true);
     setSearch('');
+    calcDropdownDirection();
   };
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) setSearch('');
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+      setSearch('');
+      calcDropdownDirection();
+    }
   };
 
   return (
@@ -144,7 +162,8 @@ const Autocomplete = ({
 
       {isOpen && (
         <div
-          className={`absolute z-10 w-full mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg max-h-48 overflow-auto ${dropdownClassName}`}
+          className={`absolute z-50 w-full bg-popover text-popover-foreground border border-border rounded-lg shadow-lg max-h-48 overflow-auto ${dropdownClassName}`}
+          style={dropdownUp ? { bottom: '100%', marginBottom: '4px' } : { top: '100%', marginTop: '4px' }}
         >
           {getFilteredOptions().length === 0 && !canCreate ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">{emptyMessage}</div>

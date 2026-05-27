@@ -20,6 +20,7 @@ export async function GET() {
         id: true,
         name: true,
         type: true,
+        price: true,
         createdAt: true,
       },
       orderBy: {
@@ -41,7 +42,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, type } = body;
+    const { name, type, price } = body;
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -73,11 +74,13 @@ export async function POST(request) {
       data: {
         name: normalizedName,
         type: type || 'SOUP',
+        price: price !== undefined ? parseFloat(price) : 0,
       },
       select: {
         id: true,
         name: true,
         type: true,
+        price: true,
         createdAt: true,
       },
     });
