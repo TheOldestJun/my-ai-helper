@@ -13,7 +13,7 @@ import { useCreateProduct, useCreateUnit } from '../../../hooks/useMutations';
 const passTypes = [
   { id: 'import', label: 'Ввіз' },
   { id: 'export', label: 'Вивіз' },
-  { id: 'import_with_export', label: 'Ввіз з наступним вивозом' },
+  { id: 'import_with_export', label: 'Ввіз/Вивіз' },
 ];
 
 const MAX_ITEMS = 31;
@@ -138,6 +138,17 @@ const Passes = () => {
 
       ws.getCell('G56').value = fmt(start);
       ws.getCell('G57').value = fmt(end);
+
+      filledItems.forEach((item, i) => {
+        const row = 18 + i;
+        if (row > 48) return;
+        const product = products.find((p) => p.id === item.productId);
+        const unit = units.find((u) => u.id === item.unitId);
+        ws.getCell(`A${row}`).value = i + 1;
+        ws.getCell(`B${row}`).value = product ? product.name : '';
+        ws.getCell(`D${row}`).value = unit ? unit.symbol : '';
+        ws.getCell(`E${row}`).value = item.quantity ? Number(item.quantity) : '';
+      });
 
       const outBuf = await wb.xlsx.writeBuffer();
       const blob = new Blob([outBuf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
