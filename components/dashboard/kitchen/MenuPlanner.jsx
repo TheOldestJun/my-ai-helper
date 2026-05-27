@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -55,10 +55,24 @@ const MenuPlanner = () => {
   const createDish = useCreateDish();
   const updateDish = useUpdateDish();
   const createResolveRef = useRef(null);
-  const [menu, setMenu] = useState({});
+  const [menu, setMenu] = useState(() => {
+    try {
+      const saved = localStorage.getItem('weeklyMenu');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [priceInputs, setPriceInputs] = useState({});
   const [createModal, setCreateModal] = useState({ open: false, name: '', mealTypeId: '', price: '' });
-  const [selectedDays, setSelectedDays] = useState(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
+  const [selectedDays, setSelectedDays] = useState(() => {
+    try {
+      const saved = localStorage.getItem('selectedDays');
+      return saved ? JSON.parse(saved) : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    } catch {
+      return ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    }
+  });
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
     const day = now.getDay();
@@ -104,34 +118,14 @@ const MenuPlanner = () => {
   }, [startDate, selectedDays]);
 
   const toggleDay = (dayId) => {
-    setSelectedDays((prev) =>
-      prev.includes(dayId) ? prev.filter((id) => id !== dayId) : [...prev, dayId]
-    );
+    setSelectedDays((prev) => {
+      const next = prev.includes(dayId)
+        ? prev.filter((id) => id !== dayId)
+        : [...prev, dayId];
+      localStorage.setItem('selectedDays', JSON.stringify(next));
+      return next;
+    });
   };
-  useEffect(() => {
-    const saved = localStorage.getItem('weeklyMenu');
-    if (saved) {
-      try {
-        setMenu(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse menu');
-      }
-    }
-    const savedDays = localStorage.getItem('selectedDays');
-    if (savedDays) {
-      try {
-        setSelectedDays(JSON.parse(savedDays));
-      } catch (e) {
-        console.error('Failed to parse selectedDays');
-      }
-    }
-  }, []);
-
-  // Зберігаємо вибрані дні
-  useEffect(() => {
-    localStorage.setItem('selectedDays', JSON.stringify(selectedDays));
-  }, [selectedDays]);
-
   const handleAddDish = (day, mealType, dishId) => {
     if (!dishId) return;
 
