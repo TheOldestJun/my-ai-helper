@@ -21,7 +21,7 @@ cd my-ai-helper
 cp .env.example .env    # отредактировать DATABASE_URL
 npm install
 npx prisma generate
-npx prisma migrate deploy
+npx prisma migrate dev
 npx prisma db seed
 npm run dev
 ```
@@ -31,7 +31,7 @@ npm run dev
 - **MySQL** через Prisma ORM
 - Схема: `prisma/schema.prisma`
 - Сиды: `prisma/seed.js` (пользователи), `prisma/seed-dishes.js` (блюда для кухни)
-- Миграции: `npx prisma migrate dev` (создать), `npx prisma migrate deploy` (применить)
+- Миграции: `npx prisma migrate dev` (создать и применить)
 
 # Архитектура проекта
 
