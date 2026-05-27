@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ChevronDown, ChevronRight, HelpCircle, UserCheck, ShoppingCart,
   Warehouse, Building2, UtensilsCrossed, ArrowRight, Archive,
-  Shield, FileText
+  Shield, FileText, ArrowLeft, Milk, Calculator, ClipboardList
 } from 'lucide-react';
 
 const sections = [
@@ -14,7 +15,7 @@ const sections = [
     title: 'Про систему',
     content: (
       <div className="space-y-3">
-        <p>My AI Helper — система для управління заявками на закупівлю товарів на підприємстві. Вона автоматизує повний цикл: від подання заявки співробітником до отримання товару на складі.</p>
+        <p>My AI Helper — система для автоматизації роботи підприємства. Включає управління заявками на закупівлю (повний цикл: від подання до отримання на складі), оформлення перепусток на ввіз/вивіз, планування меню для кухні, облік молока та розрахунок продуктів.</p>
         <p>Кожен користувач може мати одну або кілька ролей. У верхній частині дашборда відображаються кнопки для перемикання між ролями.</p>
       </div>
     ),
@@ -43,7 +44,7 @@ const sections = [
         </div>
         <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
           <h4 className="font-medium text-orange-800 dark:text-orange-200">Кухня (KITCHEN)</h4>
-          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Планує меню на тиждень, веде облік молока, розраховує кількість продуктів на порції.</p>
+          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Планує меню на тиждень з цінами страв, веде облік молока, розраховує кількість продуктів на порції.</p>
         </div>
         <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
           <h4 className="font-medium text-purple-800 dark:text-purple-200">Адміністратор (ADMIN)</h4>
@@ -159,7 +160,7 @@ const sections = [
         <p className="text-sm text-muted-foreground">Функція доступна у відділі снабження на вкладці <strong>«Перепустки»</strong>.</p>
         <ol className="list-decimal list-inside space-y-2 text-sm">
           <li>Виберіть тип перепустки: «Ввіз», «Вивіз» або «Ввіз/Вивіз».</li>
-          <li>Вкажіть дату початку дії. Дата закінчення розраховується автоматично (+7 днів).</li>
+          <li>Виберіть дату початку дії через календар. Дата закінчення розраховується автоматично (+7 днів).</li>
           <li>Додайте товари до перепустки — кожен наступний рядок з&rsquo;являється після заповнення попереднього.</li>
           <li>Максимум 31 позиція в одній перепустці.</li>
           <li>Натисніть <strong>«Зберегти перепустку»</strong> — Excel-файл згенерується і завантажиться автоматично.</li>
@@ -192,20 +193,22 @@ const sections = [
         <p className="text-sm text-muted-foreground">Кухні доступні вкладки: <strong>«Меню на тиждень»</strong>, <strong>«Молоко»</strong>, <strong>«Розрахунки»</strong>.</p>
         <div className="space-y-4">
           <div>
-            <h4 className="font-medium mb-1">🍽️ Планування меню</h4>
+            <h4 className="font-medium mb-1 flex items-center gap-2"><ClipboardList className="w-4 h-4" /> Планування меню</h4>
             <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Виберіть дні тижня (Пн–Пт), на які плануєте меню.</li>
-              <li>Для кожного дня та типу страви (Перше, Гарнір, М&rsquo;ясне, Салат, Випічка, Напій) додайте блюдо через автокомпліт.</li>
-              <li>Створюйте нові блюда прямо при введенні.</li>
-              <li>Натисніть <strong>«Експорт PDF»</strong> для вивантаження меню у файл.</li>
+              <li>Встановіть початок тижня через календар — тиждень будується відносно цієї дати.</li>
+              <li>Оберіть робочі дні через чекбокси (Пн–Пт). Таблиця покаже лише вибрані дні з правильними датами.</li>
+              <li>Для кожного дня та типу страви (Перше, Гарнір, М&rsquo;ясне, Салат, Випічка, Напій) оберіть страву через автокомпліт. В комірці одночасно може бути лише одна страва.</li>
+              <li>До кожної страви можна вказати ціну — поруч з автокомплітом є поле для введення ціни. При зміні ціна зберігається автоматично (при втраті фокусу або натисканні Enter).</li>
+              <li>Якщо страви з потрібною назвою не існує, автокомпліт запропонує створити нову — з&rsquo;явиться модальне вікно для введення ціни.</li>
+              <li>Натисніть <strong>«Експорт PDF»</strong> — згенерується файл з усіма днями, стравами, цінами та денною сумою по кожному дню.</li>
             </ol>
           </div>
           <div>
-            <h4 className="font-medium mb-1">🥛 Облік молока</h4>
-            <p className="text-sm text-muted-foreground">Простий трекер для щоденного обліку молока. Дані зберігаються локально в браузері.</p>
+            <h4 className="font-medium mb-1 flex items-center gap-2"><Milk className="w-4 h-4" /> Облік молока</h4>
+            <p className="text-sm text-muted-foreground">Щоденний трекер молока. Додавайте записи з датою (вибір через календар), кількістю літрів та приміткою. Дані зберігаються локально в браузері.</p>
           </div>
           <div>
-            <h4 className="font-medium mb-1">📊 Розрахунки</h4>
+            <h4 className="font-medium mb-1 flex items-center gap-2"><Calculator className="w-4 h-4" /> Розрахунки</h4>
             <p className="text-sm text-muted-foreground">Калькулятор для розрахунку кількості продуктів на задану кількість порцій.</p>
           </div>
         </div>
@@ -269,6 +272,7 @@ const Section = ({ section, isOpen, onToggle }) => {
 };
 
 const HelpPage = () => {
+  const router = useRouter();
   const [openSection, setOpenSection] = useState(null);
 
   const toggleSection = (id) => {
@@ -278,12 +282,20 @@ const HelpPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Назад
+        </button>
+
         <div className="flex items-center gap-3 mb-2">
           <HelpCircle className="w-8 h-8 text-primary" />
           <h1 className="text-3xl font-bold text-foreground">Допомога</h1>
         </div>
         <p className="text-muted-foreground">
-          Інструкція з роботи з системою управління заявками на закупівлю.
+          Інструкція з роботи з системою управління закупівлями, перепустками та плануванням меню.
         </p>
 
         <div className="space-y-3">

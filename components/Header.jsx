@@ -21,6 +21,11 @@ import { ThemeToggle } from './ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasUser, setHasUser] = useState(false);
+
+  useEffect(() => {
+    setHasUser(!!localStorage.getItem('user'));
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -34,7 +39,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <Link href={hasUser ? '/dashboard' : '/'} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
               <Image src="/logo.png" alt="Logo" width={36} height={36} className="rounded" />
               <span className="text-white font-semibold text-lg hidden sm:block">My AI Helper</span>
             </Link>
