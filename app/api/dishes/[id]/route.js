@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
 
+// PATCH /api/dishes/[id] — обновить цену/название блюда
+// Тело: { price?, name? } (хотя бы одно поле обязательно)
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
