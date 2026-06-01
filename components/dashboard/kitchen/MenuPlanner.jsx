@@ -464,7 +464,7 @@ const MenuPlanner = () => {
                           labelKey="name"
                           valueKey="id"
                           searchKeys={['name']}
-                          displayFormat={(d) => `${d.name} — ${Number(d.price || 0).toFixed(2)}₴`}
+                          displayFormat={(d) => d.name}
                           emptyMessage="Немає страв. Введіть назву для створення."
                         />
                       </div>
