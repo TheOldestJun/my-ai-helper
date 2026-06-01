@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { FileText } from 'lucide-react';
 
-import { useOrders } from '../../../hooks/useApi';
-import { useApproveProduct, useRejectProduct } from '../../../hooks/useMutations';
+import { useOrders } from '../../../hooks/useOrdersQuery';
+import { useApproveProduct, useRejectProduct } from '../../../hooks/useOrderProductMutations';
 
 /**
  * DirectorateOrderList - Компонент для директора

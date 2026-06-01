@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import ExecutorOrderList from '../shared/ExecutorOrderList';
-import ArchiveOrders from '../shared/ArchiveOrders';
+import ExecutorOrderList from '../orders/ExecutorOrderList';
+import ArchiveOrders from '../orders/ArchiveOrders';
 import Passes from './Passes';
 
 /**

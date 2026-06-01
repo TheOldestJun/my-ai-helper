@@ -5,8 +5,9 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 import OrderItemEditForm from './OrderItemEditForm';
-import { useOrders } from '../../../hooks/useApi';
-import { useApproveOrder, useRejectOrder, useDeleteOrder, useDeleteOrderProduct, useArchiveOrder } from '../../../hooks/useMutations';
+import { useOrders } from '../../../hooks/useOrdersQuery';
+import { useApproveOrder, useRejectOrder, useDeleteOrder, useArchiveOrder } from '../../../hooks/useOrderMutations';
+import { useDeleteOrderProduct } from '../../../hooks/useOrderProductMutations';
 
 /**
  * OrderList - Компонент для отображения списка заявок

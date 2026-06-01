@@ -4,8 +4,9 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 import Autocomplete from '@/components/Autocomplete';
-import { useProducts, useUnits } from '../../../hooks/useApi';
-import { useCreateProduct, useCreateOrder } from '../../../hooks/useMutations';
+import { useProducts, useUnits } from '../../../hooks/useProductsUnitsQuery';
+import { useCreateProduct } from '../../../hooks/useProductUnitMutations';
+import { useCreateOrder } from '../../../hooks/useOrderMutations';
 
 /**
  * OrderCreationForm - Форма для создания новой заявки

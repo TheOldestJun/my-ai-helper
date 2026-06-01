@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import React from 'react';
 import { FileText, ChevronRight, ChevronDown } from 'lucide-react';
-import { useOrders } from '../../../hooks/useApi';
+import { useOrders } from '../../../hooks/useOrdersQuery';
 
 /**
  * DirectorateOrderSummaryTable - Сводная таблица заявок с деревом вложенных пунктов

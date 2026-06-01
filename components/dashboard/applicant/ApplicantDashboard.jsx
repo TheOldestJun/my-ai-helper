@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import OrderList from '../shared/OrderList';
-import OrderCreationForm from '../shared/OrderCreationForm';
-import ArchiveOrders from '../shared/ArchiveOrders';
+import OrderList from '../orders/OrderList';
+import OrderCreationForm from '../orders/OrderCreationForm';
+import ArchiveOrders from '../orders/ArchiveOrders';
 
 /**
  * ApplicantDashboard - Дашборд для заявителей

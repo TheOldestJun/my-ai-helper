@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X, Archive, ChevronRight, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useArchivedOrders } from '../../../hooks/useApi';
+import { useArchivedOrders } from '../../../hooks/useOrdersQuery';
 
 /**
  * ArchiveOrders - Компонент для отображения архивных заявок в виде дерева

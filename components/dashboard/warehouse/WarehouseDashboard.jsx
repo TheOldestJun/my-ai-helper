@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import WarehouseOrderList from '../shared/WarehouseOrderList';
-import ArchiveOrders from '../shared/ArchiveOrders';
+import WarehouseOrderList from '../orders/WarehouseOrderList';
+import ArchiveOrders from '../orders/ArchiveOrders';
 
 /**
  * WarehouseDashboard - Дашборд для складу

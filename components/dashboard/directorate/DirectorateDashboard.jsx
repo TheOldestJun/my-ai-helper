@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import DirectorateOrderList from './DirectorateOrderList';
 import DirectorateOrderSummaryTable from './DirectorateOrderSummaryTable';
-import ArchiveOrders from '../shared/ArchiveOrders';
+import ArchiveOrders from '../orders/ArchiveOrders';
 
 const DirectorateDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');

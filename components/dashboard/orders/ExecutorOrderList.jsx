@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useApprovedProducts, useWarehouseProducts } from '../../../hooks/useApi';
-import { useChangeProductStatus } from '../../../hooks/useMutations';
+import { useApprovedProducts, useWarehouseProducts } from '../../../hooks/useOrdersQuery';
+import { useChangeProductStatus } from '../../../hooks/useOrderProductMutations';
 
 /**
  * ExecutorOrderList - Компонент для исполнителей (снабжение, склад)

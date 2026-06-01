@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { Truck, CircleCheck, X, Package } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useWarehouseProducts } from '../../../hooks/useApi';
-import { useChangeProductStatus } from '../../../hooks/useMutations';
+import { useWarehouseProducts } from '../../../hooks/useOrdersQuery';
+import { useChangeProductStatus } from '../../../hooks/useOrderProductMutations';
 
 /**
  * WarehouseOrderList - Компонент для склада
