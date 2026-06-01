@@ -105,7 +105,6 @@ export async function GET(request) {
       await prisma.order.delete({
         where: { id: emptyOrder.id },
       });
-      console.log('Deleted empty order:', emptyOrder.number);
     }
 
     // Возвращаем только непустые заявки

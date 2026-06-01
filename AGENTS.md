@@ -10,6 +10,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Для разработки: `npm run dev`
 - Не запускать `npm run build` для проверки — только для продакшена
 - Dev-сервер запускать через detached node process (из-за ограничений окружения)
+- **Ніколи не пушити в GitHub без мого дозволу**
 <!-- END:workflow -->
 
 <!-- BEGIN:setup -->
@@ -44,17 +45,23 @@ components/
   dashboard/
     kitchen/    — кухня: MenuPlanner, MilkTracker, KitchenCalculations
     supply/     — снабжение: заявки, перепустки
-    warehouse/  — склад
-    directorate/— директорат
-    applicant/  — заявник
-    shared/     — общие компоненты (OrderCreationForm, OrderList, etc.)
+    orders/      — заявки (OrderList, OrderCreationForm, etc.)
+    warehouse/   — склад
+    directorate/ — директорат
+    applicant/   — заявник
   Autocomplete.jsx  — кастомный автокомплит с созданием на лету
   DatePicker.jsx    — обёртка react-datepicker (локализация uk, dd.MM.yyyy)
   Header.jsx        — шапка с логотипом, меню, ThemeToggle
   LoginForm.jsx     — форма входа
 hooks/
-  useApi.js         — хуки TanStack Query для GET-запросов
-  useMutations.js   — хуки TanStack Query для POST/PATCH/DELETE
+  useOrdersQuery.js         — хуки TanStack Query для заявок (GET)
+  useDishesQuery.js         — хуки для страв (GET)
+  useProductsUnitsQuery.js  — хуки для товарів/одиниць (GET)
+  useUsersQuery.js          — хуки для користувачів (GET)
+  useOrderMutations.js      — мутації заявок (POST/PATCH/DELETE)
+  useOrderProductMutations.js — мутації пунктів заявок
+  useProductUnitMutations.js  — мутації товарів/одиниць
+  useDishMutations.js         — мутації страв
 prisma/
   schema.prisma     — схема БД
   seed.js           — сид пользователей

@@ -287,11 +287,8 @@ export async function DELETE(request, { params }) {
       where: { orderId },
     });
 
-    console.log('Remaining products in order:', remainingProducts.length);
-
     // Если пунктов не осталось, удаляем заявку
     if (remainingProducts.length === 0) {
-      console.log('Order is empty, deleting order:', orderId);
       await prisma.order.delete({
         where: { id: orderId },
       });

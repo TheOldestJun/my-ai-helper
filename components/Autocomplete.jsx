@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Plus, ChevronDown } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+
 
 /**
  * Autocomplete - Компонент автозаполнения с возможностью создания новых элементов
