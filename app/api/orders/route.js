@@ -34,6 +34,7 @@ export const GET = requireAuth(async (request) => {
     if (filterArchived) {
       whereClause.archivedAt = null;
     }
+    whereClause.products = { some: {} };
 
     const orders = await prisma.order.findMany({
       where: whereClause,
@@ -85,18 +86,7 @@ export const GET = requireAuth(async (request) => {
       },
     });
 
-    // Удаляем пустые заявки
-    const emptyOrders = orders.filter(order => order.products.length === 0);
-    for (const emptyOrder of emptyOrders) {
-      await prisma.order.delete({
-        where: { id: emptyOrder.id },
-      });
-    }
-
-    // Возвращаем только непустые заявки
-    const nonEmptyOrders = orders.filter(order => order.products.length > 0);
-
-    return NextResponse.json({ orders: nonEmptyOrders }, { status: 200 });
+    return NextResponse.json({ orders }, { status: 200 });
   } catch (error) {
     console.error('Помилка отримання замовлень:', error);
     return NextResponse.json(

@@ -2,9 +2,29 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/prisma';
 import { signToken } from '@/lib/auth';
+import { rateLimit } from '@/lib/rateLimiter';
 
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'unknown';
+
+    const { allowed, remaining, resetTime } = rateLimit(ip);
+    if (!allowed) {
+      const retryAfter = Math.ceil((resetTime - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: 'Забагато запитів. Спробуйте пізніше.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email, password } = body;
 
