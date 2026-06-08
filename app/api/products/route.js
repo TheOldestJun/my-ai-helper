@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для управления товарами
@@ -12,7 +13,7 @@ import prisma from '@/prisma';
  * - description: Описание товара
  */
 
-export async function GET() {
+export const GET = requireAuth(async () => {
   try {
     const products = await prisma.product.findMany({
       select: {
@@ -51,9 +52,9 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(request) {
+export const POST = requireAuth(async (request) => {
   try {
     const body = await request.json();
     const { name, description } = body;
@@ -126,4 +127,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

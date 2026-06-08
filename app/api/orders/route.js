@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для управления заявками
@@ -17,34 +18,19 @@ import prisma from '@/prisma';
  * - products: Массив товаров [{ productId, unitId, quantity, notes }]
  */
 
-export async function GET(request) {
+export const GET = requireAuth(async (request) => {
   try {
-    // Получаем userId из query параметра (временное решение до добавления auth middleware)
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const user = request.user;
+    const userRoleNames = (user.roles || []).map(r => r.name);
+    const isApplicant = userRoleNames.includes('APPLICANT');
 
-    // Проверяем роль пользователя для фильтрации архивных заявок
     let filterArchived = true;
-    if (userId) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
-      });
-
-      // Снабжение может видеть все заявки, включая архивные
-      const hasSupplyRole = user?.roles?.some(r => r.role.name === 'SUPPLY');
-      if (hasSupplyRole) {
-        filterArchived = false;
-      }
+    const hasSupplyRole = userRoleNames.includes('SUPPLY');
+    if (hasSupplyRole) {
+      filterArchived = false;
     }
 
-    const whereClause = userId ? { createdById: userId } : {};
+    const whereClause = isApplicant ? { createdById: user.id } : {};
     if (filterArchived) {
       whereClause.archivedAt = null;
     }
@@ -118,14 +104,14 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(request) {
+export const POST = requireAuth(async (request) => {
   try {
     const body = await request.json();
-    const { priority, notes, products, userId } = body;
+    const { priority, notes, products } = body;
+    const user = request.user;
 
-    // Валидация
     if (!products || products.length === 0) {
       return NextResponse.json(
         { error: 'Додайте хоча б один товар' },
@@ -133,7 +119,6 @@ export async function POST(request) {
       );
     }
 
-    // Проверяем товары
     for (const item of products) {
       if (!item.productId || !item.unitId || !item.quantity || item.quantity <= 0) {
         return NextResponse.json(
@@ -142,10 +127,6 @@ export async function POST(request) {
         );
       }
     }
-
-    // Получаем текущего пользователя из localStorage на клиенте
-    // или используем userId из запроса (временное решение)
-    const currentUserId = userId || 'system';
 
     // Генерируем номер заказа (формат: ЗАМ-YYYYMMDD-XXX)
     const today = new Date();
@@ -165,7 +146,7 @@ export async function POST(request) {
         number: orderNumber,
         priority: priority || 'NORMAL',
         notes: notes || null,
-        createdById: currentUserId,
+        createdById: user.id,
         products: {
           create: products.map((item) => ({
             productId: item.productId,
@@ -219,4 +200,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

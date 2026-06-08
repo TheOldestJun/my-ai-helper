@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/client-auth';
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
@@ -8,7 +9,7 @@ export const useCreateProduct = () => {
     mutationFn: async (productName) => {
       const response = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ name: productName }),
       });
       if (!response.ok) {
@@ -33,7 +34,7 @@ export const useCreateUnit = () => {
     mutationFn: async (unitData) => {
       const response = await fetch('/api/units', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(unitData),
       });
       if (!response.ok) {

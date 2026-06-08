@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { useApprovedProducts, useWarehouseProducts } from '../../../hooks/useOrdersQuery';
 import { useChangeProductStatus } from '../../../hooks/useOrderProductMutations';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * ExecutorOrderList - Компонент для исполнителей (снабжение, склад)
@@ -80,8 +81,7 @@ const ExecutorOrderList = () => {
   const approvedProducts = approvedProductsData?.products || [];
 
   // Получаем роль текущего пользователя
-  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = storedUser ? JSON.parse(storedUser) : null;
+  const user = getStoredUser();
   const userRoles = user?.roles?.map(r => r.name) || [];
   const isSupply = userRoles.includes('SUPPLY');
   const isWarehouse = userRoles.includes('WAREHOUSE');
@@ -94,16 +94,13 @@ const ExecutorOrderList = () => {
     : ['ORDERED', 'PAID', 'IN_TRANSIT', 'RECEIVED'];  // Fallback
 
   const handleStatusChange = (orderId, productId, newStatus) => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    if (!getStoredUser()) {
       toast.error('Користувач не авторизований');
       return;
     }
 
     changeProductStatus.mutate(
-      { orderId, productId, status: newStatus, userId: user.id },
+      { orderId, productId, status: newStatus },
       {
         onSuccess: () => {
           setStatusDropdown({ open: false, itemId: null });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для управления конкретной заявкой
@@ -19,15 +20,16 @@ import prisma from '@/prisma';
  * - notes: Новые примечания
  * - products: Массив товаров для обновления
  */
-export async function PATCH(request, { params }) {
+export const PATCH = requireAuth(async (request, { params }) => {
   try {
     const body = await request.json();
-    const { action, userId, rejectionReason } = body;
+    const { action, rejectionReason } = body;
+    const user = request.user;
     const { id } = await params;
 
-    if (!action || !userId) {
+    if (!action) {
       return NextResponse.json(
-        { error: 'Не вказано дію або ID користувача' },
+        { error: 'Не вказано дію' },
         { status: 400 }
       );
     }
@@ -39,7 +41,7 @@ export async function PATCH(request, { params }) {
           history: {
             create: {
               action: 'APPROVED',
-              changedById: userId,
+              changedById: user.id,
             },
           },
         },
@@ -65,7 +67,7 @@ export async function PATCH(request, { params }) {
           history: {
             create: {
               action: 'REJECTED',
-              changedById: userId,
+              changedById: user.id,
               reason: rejectionReason,
             },
           },
@@ -89,9 +91,9 @@ export async function PATCH(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request, { params }) {
+export const PUT = requireAuth(async (request, { params }) => {
   try {
     const body = await request.json();
     const { priority, notes, products } = body;
@@ -139,9 +141,6 @@ export async function PUT(request, { params }) {
       data: {
         priority: priority || existingOrder.priority,
         notes: notes || null,
-        rejectedById: null,
-        rejectedAt: null,
-        rejectionReason: null,
         products: {
           create: products.map((item) => ({
             productId: item.productId,
@@ -195,9 +194,9 @@ export async function PUT(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(request, { params }) {
+export const DELETE = requireAuth(async (request, { params }) => {
   try {
     const { id } = await params;
 
@@ -249,4 +248,4 @@ export async function DELETE(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

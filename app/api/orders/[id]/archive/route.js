@@ -1,48 +1,12 @@
 import prisma from '@/prisma';
 import { NextResponse } from 'next/server';
+import { requireRole } from '@/lib/auth';
 
-/**
- * API route для архивации заявки
- * 
- * PATCH /api/orders/[id]/archive - Архивация заявки
- * 
- * Используется заявителем для закрытия заявки после получения всех товаров.
- * Только заявитель может архивировать свои заявки.
- * Заявка должна иметь статус RECEIVED для всех товаров.
- */
-export async function PATCH(request, { params }) {
+export const PATCH = requireRole('APPLICANT')(async (request, { params }) => {
   try {
     const orderId = (await params).id;
-    const { userId } = await request.json();
+    const user = request.user;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Не вказано ID користувача' },
-        { status: 400 }
-      );
-    }
-
-    // Проверка прав: только заявитель может архивировать свои заявки
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
-    });
-
-    const hasApplicantRole = user?.roles?.some(r => r.role.name === 'APPLICANT');
-    if (!hasApplicantRole) {
-      return NextResponse.json(
-        { error: 'Тільки заявник може архівувати заявки' },
-        { status: 403 }
-      );
-    }
-
-    // Проверка, что заявка принадлежит пользователю
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -57,14 +21,13 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    if (order.createdById !== userId) {
+    if (order.createdById !== user.id) {
       return NextResponse.json(
         { error: 'Ви можете архівувати тільки свої заявки' },
         { status: 403 }
       );
     }
 
-    // Проверка, что все товары имеют статус RECEIVED
     const allProductsReceived = order.products.every(
       product => product.status === 'RECEIVED'
     );
@@ -76,7 +39,6 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Архивация заявки
     const archivedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
@@ -84,7 +46,7 @@ export async function PATCH(request, { params }) {
         history: {
           create: {
             action: 'ARCHIVED',
-            changedById: userId,
+            changedById: user.id,
           },
         },
       },
@@ -100,7 +62,5 @@ export async function PATCH(request, { params }) {
       { error: 'Внутрішня помилка сервера' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
-}
+});

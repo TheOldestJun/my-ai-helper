@@ -72,8 +72,8 @@ const orderActionLabels = {
   ARCHIVED: 'Архівовано',
 };
 
-const ArchiveOrders = ({ userId }) => {
-  const { data: archivedOrdersData, isLoading, error } = useArchivedOrders(userId);
+const ArchiveOrders = () => {
+  const { data: archivedOrdersData, isLoading, error } = useArchivedOrders();
   const [expandedOrders, setExpandedOrders] = useState({});
 
   const archivedOrders = archivedOrdersData?.orders || [];

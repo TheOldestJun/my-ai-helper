@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для получения товаров на складе
@@ -13,7 +14,7 @@ import prisma from '@/prisma';
  * о том, кто и когда изменил статус.
  */
 
-export async function GET() {
+export const GET = requireAuth(async () => {
   try {
     const warehouseProducts = await prisma.orderProduct.findMany({
       where: {
@@ -85,7 +86,5 @@ export async function GET() {
   } catch (error) {
     console.error('Помилка при отриманні заявок для складу:', error);
     return NextResponse.json({ error: 'Внутрішня помилка сервера' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
-}
+});

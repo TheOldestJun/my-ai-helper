@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для управления стравами
@@ -12,8 +13,7 @@ import prisma from '@/prisma';
  * - type: Тип стравы (SOUP, GARNISH, MEAT, SALAD, BAKERY, DRINK)
  */
 
-// GET /api/dishes - получить список блюд
-export async function GET() {
+export const GET = requireAuth(async () => {
   try {
     const dishes = await prisma.dish.findMany({
       select: {
@@ -36,10 +36,9 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});
 
-// POST /api/dishes - создать новое блюдо
-export async function POST(request) {
+export const POST = requireAuth(async (request) => {
   try {
     const body = await request.json();
     const { name, type, price } = body;
@@ -96,4 +95,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-}
+});

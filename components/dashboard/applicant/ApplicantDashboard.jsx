@@ -4,6 +4,7 @@ import { useState } from 'react';
 import OrderList from '../orders/OrderList';
 import OrderCreationForm from '../orders/OrderCreationForm';
 import ArchiveOrders from '../orders/ArchiveOrders';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * ApplicantDashboard - Дашборд для заявителей
@@ -22,11 +23,6 @@ import ArchiveOrders from '../orders/ArchiveOrders';
  */
 const ApplicantDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
-
-  // Получение ID текущего пользователя
-  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const userId = user?.id;
 
   const tabs = [
     { id: 'orders', label: 'Мої замовлення' },
@@ -73,7 +69,7 @@ const ApplicantDashboard = () => {
 
         {activeTab === 'archive' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <ArchiveOrders userId={userId} />
+            <ArchiveOrders />
           </div>
         )}
       </div>

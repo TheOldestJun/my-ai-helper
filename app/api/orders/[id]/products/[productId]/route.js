@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth, requireRole } from '@/lib/auth';
 
 /**
  * API route для управления пунктами заявки
@@ -19,15 +20,16 @@ import prisma from '@/prisma';
  * - rejectionReason: Причина отклонения (для reject)
  */
 
-export async function PATCH(request, { params }) {
+export const PATCH = requireAuth(async (request, { params }) => {
   try {
     const body = await request.json();
-    const { action, userId, rejectionReason, status } = body;
+    const { action, rejectionReason, status } = body;
+    const user = request.user;
     const { id: orderId, productId } = await params;
 
-    if (!action || !userId) {
+    if (!action) {
       return NextResponse.json(
-        { error: 'Не вказано дію або ID користувача' },
+        { error: 'Не вказано дію' },
         { status: 400 }
       );
     }
@@ -37,13 +39,13 @@ export async function PATCH(request, { params }) {
         where: { id: productId },
         data: {
           status: 'APPROVED',
-          statusChangedById: userId,
+          statusChangedById: user.id,
           statusChangedAt: new Date(),
           statusHistory: {
             create: {
               oldStatus: 'PENDING',
               newStatus: 'APPROVED',
-              changedById: userId,
+              changedById: user.id,
             },
           },
         },
@@ -67,13 +69,13 @@ export async function PATCH(request, { params }) {
         where: { id: productId },
         data: {
           status: 'REJECTED',
-          statusChangedById: userId,
+          statusChangedById: user.id,
           statusChangedAt: new Date(),
           statusHistory: {
             create: {
               oldStatus: 'PENDING',
               newStatus: 'REJECTED',
-              changedById: userId,
+              changedById: user.id,
             },
           },
         },
@@ -101,19 +103,7 @@ export async function PATCH(request, { params }) {
         );
       }
 
-      // Получаем роль пользователя для проверки прав
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
-      });
-
-      const userRoles = user?.roles?.map(r => r.role.name) || [];
+      const userRoles = (user.roles || []).map(r => r.name);
       const hasSupplyRole = userRoles.includes('SUPPLY');
       const hasWarehouseRole = userRoles.includes('WAREHOUSE');
 
@@ -145,13 +135,13 @@ export async function PATCH(request, { params }) {
         where: { id: productId },
         data: {
           status,
-          statusChangedById: userId,
+          statusChangedById: user.id,
           statusChangedAt: new Date(),
           statusHistory: {
             create: {
               oldStatus,
               newStatus: status,
-              changedById: userId,
+              changedById: user.id,
             },
           },
         },
@@ -189,9 +179,9 @@ export async function PATCH(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request, { params }) {
+export const PUT = requireAuth(async (request, { params }) => {
   try {
     const body = await request.json();
     const { quantity, unitId, notes } = body;
@@ -251,9 +241,9 @@ export async function PUT(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(request, { params }) {
+export const DELETE = requireAuth(async (request, { params }) => {
   try {
     const { id: orderId, productId } = await params;
 
@@ -309,4 +299,4 @@ export async function DELETE(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

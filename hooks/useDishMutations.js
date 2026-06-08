@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/client-auth';
 
 export const useCreateDish = () => {
   const queryClient = useQueryClient();
@@ -8,7 +9,7 @@ export const useCreateDish = () => {
     mutationFn: async (dishData) => {
       const response = await fetch('/api/dishes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(dishData),
       });
       if (!response.ok) {
@@ -30,7 +31,7 @@ export const useUpdateDish = () => {
     mutationFn: async ({ id, ...data }) => {
       const response = await fetch(`/api/dishes/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
       if (!response.ok) {
@@ -50,7 +51,7 @@ export const useDeleteDish = () => {
 
   return useMutation({
     mutationFn: async (dishId) => {
-      const response = await fetch(`/api/dishes/${dishId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/dishes/${dishId}`, { method: 'DELETE', headers: getAuthHeaders() });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Помилка при видаленні страви');

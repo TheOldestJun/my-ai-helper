@@ -23,6 +23,7 @@ import {
   WarehouseDashboard,
   DirectorateDashboard,
 } from '@/components/dashboard';
+import { getStoredUser, getToken, logout as clearAuth } from '@/lib/client-auth';
 
 const roleDashboards = {
   ADMIN: AdminDashboard,
@@ -57,19 +58,34 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      if (parsedUser.roles && parsedUser.roles.length > 0) {
-        setActiveRole(parsedUser.roles[0].name);
-      }
+    const token = getToken();
+    if (!token) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    // Verify token is still valid
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Token invalid');
+        return res.json();
+      })
+      .then(data => {
+        setUser(data.user);
+        if (data.user.roles && data.user.roles.length > 0) {
+          setActiveRole(data.user.roles[0].name);
+        }
+      })
+      .catch(() => {
+        clearAuth();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    clearAuth();
     window.location.href = '/';
   };
 

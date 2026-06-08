@@ -8,6 +8,7 @@ import OrderItemEditForm from './OrderItemEditForm';
 import { useOrders } from '../../../hooks/useOrdersQuery';
 import { useApproveOrder, useRejectOrder, useDeleteOrder, useArchiveOrder } from '../../../hooks/useOrderMutations';
 import { useDeleteOrderProduct } from '../../../hooks/useOrderProductMutations';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * OrderList - Компонент для отображения списка заявок
@@ -107,34 +108,28 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
   };
 
   const handleArchiveOrder = (orderId) => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    const user = getStoredUser();
+    if (!user) {
       toast.error('Користувач не авторизований');
       return;
     }
 
-    archiveOrder.mutate({ orderId, userId: user.id });
+    archiveOrder.mutate({ orderId });
   };
 
   const handleApprove = (orderId) => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    const user = getStoredUser();
+    if (!user) {
       toast.error('Користувач не авторизований');
       return;
     }
 
-    approveOrder.mutate({ orderId, userId: user.id });
+    approveOrder.mutate({ orderId });
   };
 
   const handleReject = () => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    const user = getStoredUser();
+    if (!user) {
       toast.error('Користувач не авторизований');
       return;
     }
@@ -145,7 +140,7 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
     }
 
     rejectOrder.mutate(
-      { orderId: rejectModal.orderId, userId: user.id, rejectionReason: rejectModal.reason },
+      { orderId: rejectModal.orderId, rejectionReason: rejectModal.reason },
       {
         onSuccess: () => {
           setRejectModal({ open: false, orderId: null, reason: '' });

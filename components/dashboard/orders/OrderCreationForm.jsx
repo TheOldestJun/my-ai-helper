@@ -7,6 +7,7 @@ import Autocomplete from '@/components/Autocomplete';
 import { useProducts, useUnits } from '../../../hooks/useProductsUnitsQuery';
 import { useCreateProduct } from '../../../hooks/useProductUnitMutations';
 import { useCreateOrder } from '../../../hooks/useOrderMutations';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * OrderCreationForm - Форма для создания новой заявки
@@ -102,11 +103,9 @@ const OrderCreationForm = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Отримуємо користувача з localStorage
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-    
-    if (!user || !user.id) {
+    const user = getStoredUser();
+
+    if (!user) {
       toast.error('Користувач не авторизований. Увійдіть в систему.');
       setLoading(false);
       return;
@@ -126,7 +125,6 @@ const OrderCreationForm = () => {
       await createOrder.mutateAsync({
         priority: formData.priority,
         notes: formData.notes,
-        userId: user.id,
         products: validItems.map((item) => ({
           productId: item.productId,
           unitId: item.unitId,

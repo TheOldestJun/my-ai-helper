@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/client-auth';
 
 export const useChangeProductStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, productId, status, userId }) => {
+    mutationFn: async ({ orderId, productId, status }) => {
       const response = await fetch(`/api/orders/${orderId}/products/${productId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'changeStatus', status, userId }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ action: 'changeStatus', status }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -53,7 +54,7 @@ export const useDeleteOrderProduct = () => {
 
   return useMutation({
     mutationFn: async ({ orderId, productId }) => {
-      const response = await fetch(`/api/orders/${orderId}/products/${productId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/orders/${orderId}/products/${productId}`, { method: 'DELETE', headers: getAuthHeaders() });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Помилка при видаленні пункту');
@@ -82,11 +83,11 @@ export const useApproveProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, productId, userId }) => {
+    mutationFn: async ({ orderId, productId }) => {
       const response = await fetch(`/api/orders/${orderId}/products/${productId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve', userId }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ action: 'approve' }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -116,11 +117,11 @@ export const useRejectProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, productId, userId, rejectionReason }) => {
+    mutationFn: async ({ orderId, productId, rejectionReason }) => {
       const response = await fetch(`/api/orders/${orderId}/products/${productId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reject', userId, rejectionReason }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ action: 'reject', rejectionReason }),
       });
       if (!response.ok) {
         const data = await response.json();

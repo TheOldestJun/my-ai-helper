@@ -1,50 +1,15 @@
 import prisma from '@/prisma';
 import { NextResponse } from 'next/server';
+import { requireRole } from '@/lib/auth';
 
-/**
- * API route для получения архивных заявок
- * 
- * GET /api/orders/archived - Получение списка архивных заявок
- * 
- * Доступен для ролей: SUPPLY, DIRECTORATE, WAREHOUSE, APPLICANT.
- * Заявитель видит только свои архивные заявки, остальные — все.
- * Архивные заявки хранятся не старше 3 лет.
- */
-export async function GET(request) {
+export const GET = requireRole('SUPPLY', 'DIRECTORATE', 'WAREHOUSE', 'APPLICANT')(async (request) => {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Не вказано ID користувача' },
-        { status: 400 }
-      );
-    }
-
-    // Проверка прав: архив доступен для SUPPLY, DIRECTORATE, WAREHOUSE, APPLICANT
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
-    });
-
-    const userRoleNames = user?.roles?.map(r => r.role.name) || [];
-    const hasAccess = userRoleNames.some(r => ['SUPPLY', 'DIRECTORATE', 'WAREHOUSE', 'APPLICANT'].includes(r));
-    if (!hasAccess) {
-      return NextResponse.json(
-        { error: 'Доступ заборонено' },
-        { status: 403 }
-      );
-    }
-
+    const user = request.user;
+    const userRoleNames = (user.roles || []).map(r => r.name);
     const isApplicant = userRoleNames.includes('APPLICANT');
 
     // Получение архивных заявок не старше 3 лет
@@ -149,7 +114,5 @@ export async function GET(request) {
       { error: 'Внутрішня помилка сервера' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
-}
+});

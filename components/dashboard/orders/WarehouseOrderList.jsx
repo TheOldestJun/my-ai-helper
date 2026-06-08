@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { useWarehouseProducts } from '../../../hooks/useOrdersQuery';
 import { useChangeProductStatus } from '../../../hooks/useOrderProductMutations';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * WarehouseOrderList - Компонент для склада
@@ -64,16 +65,13 @@ const WarehouseOrderList = () => {
   const warehouseProducts = warehouseProductsData?.products || [];
 
   const handleStatusChange = (orderId, productId, newStatus) => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    if (!getStoredUser()) {
       toast.error('Користувач не авторизований');
       return;
     }
 
     changeProductStatus.mutate(
-      { orderId, productId, status: newStatus, userId: user.id },
+      { orderId, productId, status: newStatus },
       {
         onSuccess: () => {
           setStatusDropdown({ open: false, itemId: null });

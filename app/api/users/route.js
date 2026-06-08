@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для управления пользователями
@@ -15,7 +16,7 @@ import prisma from '@/prisma';
  * - role: Роль пользователя (APPLICANT, DIRECTOR, SUPPLY, WAREHOUSE, KITCHEN)
  */
 
-export async function GET() {
+export const GET = requireAuth(async () => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -55,4 +56,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

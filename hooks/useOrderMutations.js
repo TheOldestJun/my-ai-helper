@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/client-auth';
 
 export const useApproveOrder = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, userId }) => {
+    mutationFn: async ({ orderId }) => {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve', userId }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ action: 'approve' }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -39,11 +40,11 @@ export const useRejectOrder = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, userId, rejectionReason }) => {
+    mutationFn: async ({ orderId, rejectionReason }) => {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reject', userId, rejectionReason }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ action: 'reject', rejectionReason }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -74,7 +75,7 @@ export const useDeleteOrder = () => {
 
   return useMutation({
     mutationFn: async (orderId) => {
-      const response = await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/orders/${orderId}`, { method: 'DELETE', headers: getAuthHeaders() });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Помилка при видаленні заявки');
@@ -106,7 +107,7 @@ export const useCreateOrder = () => {
     mutationFn: async (orderData) => {
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(orderData),
       });
       if (!response.ok) {
@@ -128,7 +129,7 @@ export const useUpdateOrder = () => {
     mutationFn: async ({ orderId, orderData }) => {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(orderData),
       });
       if (!response.ok) {
@@ -149,11 +150,10 @@ export const useArchiveOrder = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, userId }) => {
+    mutationFn: async ({ orderId }) => {
       const response = await fetch(`/api/orders/${orderId}/archive`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        headers: getAuthHeaders(),
       });
       if (!response.ok) {
         const data = await response.json();

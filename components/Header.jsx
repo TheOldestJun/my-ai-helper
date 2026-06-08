@@ -17,13 +17,14 @@ import Link from 'next/link';
  * - Отображение информации о текущем пользователе
  */
 import { ThemeToggle } from './ThemeToggle';
+import { getToken } from '@/lib/client-auth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasUser, setHasUser] = useState(false);
 
   useEffect(() => {
-    setHasUser(!!localStorage.getItem('user'));
+    setHasUser(!!getToken());
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);

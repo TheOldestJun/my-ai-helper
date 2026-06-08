@@ -14,14 +14,10 @@ import { useState } from 'react';
 import DirectorateOrderList from './DirectorateOrderList';
 import DirectorateOrderSummaryTable from './DirectorateOrderSummaryTable';
 import ArchiveOrders from '../orders/ArchiveOrders';
+import { getStoredUser } from '@/lib/client-auth';
 
 const DirectorateDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
-
-  // Получение ID текущего пользователя
-  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const userId = user?.id;
 
   const tabs = [
     { id: 'orders', label: 'Заявки на погодження' },
@@ -66,7 +62,7 @@ const DirectorateDashboard = () => {
         )}
         {activeTab === 'archive' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <ArchiveOrders userId={userId} />
+            <ArchiveOrders />
           </div>
         )}
       </div>

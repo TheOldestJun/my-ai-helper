@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ExecutorOrderList from '../orders/ExecutorOrderList';
 import ArchiveOrders from '../orders/ArchiveOrders';
 import Passes from './Passes';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * SupplyDashboard - Дашборд для снабжения
@@ -18,11 +19,6 @@ import Passes from './Passes';
  */
 const SupplyDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
-
-  // Получение ID текущего пользователя
-  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const userId = user?.id;
 
   return (
     <div className="space-y-6">
@@ -106,7 +102,7 @@ const SupplyDashboard = () => {
 
         {activeTab === 'archive' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <ArchiveOrders userId={userId} />
+            <ArchiveOrders />
           </div>
         )}
 

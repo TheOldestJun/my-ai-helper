@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
-// PATCH /api/dishes/[id] — обновить цену/название блюда
-// Тело: { price?, name? } (хотя бы одно поле обязательно)
-export async function PATCH(request, { params }) {
+export const PATCH = requireAuth(async (request, { params }) => {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -33,4 +32,4 @@ export async function PATCH(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

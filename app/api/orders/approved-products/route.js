@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/prisma';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * API route для получения одобренных товаров
@@ -13,7 +14,7 @@ import prisma from '@/prisma';
  * Сортируется по приоритету: URGENT > HIGH > NORMAL > LOW
  */
 
-export async function GET() {
+export const GET = requireAuth(async () => {
   try {
     const approvedProducts = await prisma.orderProduct.findMany({
       where: {
@@ -90,7 +91,5 @@ export async function GET() {
   } catch (error) {
     console.error('Помилка при отриманні схвалених заявок:', error);
     return NextResponse.json({ error: 'Внутрішня помилка сервера' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
-}
+});

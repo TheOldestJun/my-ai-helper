@@ -7,6 +7,7 @@ import { FileText } from 'lucide-react';
 
 import { useOrders } from '../../../hooks/useOrdersQuery';
 import { useApproveProduct, useRejectProduct } from '../../../hooks/useOrderProductMutations';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * DirectorateOrderList - Компонент для директора
@@ -71,22 +72,16 @@ const DirectorateOrderList = () => {
   const orders = ordersData?.orders || [];
 
   const handleApprove = (orderId, productId) => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    if (!getStoredUser()) {
       toast.error('Користувач не авторизований');
       return;
     }
 
-    approveProduct.mutate({ orderId, productId, userId: user.id });
+    approveProduct.mutate({ orderId, productId });
   };
 
   const handleReject = () => {
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-
-    if (!user || !user.id) {
+    if (!getStoredUser()) {
       toast.error('Користувач не авторизований');
       return;
     }
@@ -97,7 +92,7 @@ const DirectorateOrderList = () => {
     }
 
     rejectProduct.mutate(
-      { orderId: rejectModal.orderId, productId: rejectModal.productId, userId: user.id, rejectionReason: rejectModal.reason },
+      { orderId: rejectModal.orderId, productId: rejectModal.productId, rejectionReason: rejectModal.reason },
       {
         onSuccess: () => {
           setRejectModal({ open: false, productId: null, orderId: null, reason: '' });

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/prisma';
+import { signToken } from '@/lib/auth';
 
 export async function POST(request) {
   try {
     const body = await request.json();
     const { email, password } = body;
 
-    // Валидация обязательных полей
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email і пароль обов\'язкові' },
@@ -15,7 +15,6 @@ export async function POST(request) {
       );
     }
 
-    // Поиск пользователя с ролями
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
@@ -33,7 +32,6 @@ export async function POST(request) {
       },
     });
 
-    // Проверка существования пользователя
     if (!user) {
       return NextResponse.json(
         { error: 'Невірний email або пароль' },
@@ -41,7 +39,6 @@ export async function POST(request) {
       );
     }
 
-    // Проверка пароля
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -51,7 +48,6 @@ export async function POST(request) {
       );
     }
 
-    // Формируем ответ без пароля
     const userResponse = {
       id: user.id,
       email: user.email,
@@ -64,9 +60,12 @@ export async function POST(request) {
       })),
     };
 
+    const token = signToken(userResponse);
+
     return NextResponse.json(
       {
         message: 'Вхід успішний',
+        token,
         user: userResponse,
       },
       { status: 200 }

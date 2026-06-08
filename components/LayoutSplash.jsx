@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getToken } from '@/lib/client-auth';
 
 export default function LayoutSplash() {
   const [phase, setPhase] = useState('enter');
@@ -11,7 +12,7 @@ export default function LayoutSplash() {
     if (!root) return;
 
     const isHome = window.location.pathname === '/';
-    const user = localStorage.getItem('user');
+    const token = getToken();
     const splashShown = sessionStorage.getItem('splashShown');
 
     if (!isHome) {
@@ -20,7 +21,7 @@ export default function LayoutSplash() {
       return;
     }
 
-    if (user) {
+    if (token) {
       window.location.href = '/dashboard';
       return;
     }

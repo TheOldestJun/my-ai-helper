@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { login } from '@/lib/client-auth';
 
 /**
  * LoginForm - Форма входа в систему
@@ -47,8 +48,8 @@ const LoginForm = () => {
         return;
       }
 
-      // Зберігаємо користувача в localStorage
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Зберігаємо токен і користувача в localStorage
+      login(data);
 
       // Редирект на дашборд
       window.location.href = '/dashboard';

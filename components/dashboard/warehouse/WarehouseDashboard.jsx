@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import WarehouseOrderList from '../orders/WarehouseOrderList';
 import ArchiveOrders from '../orders/ArchiveOrders';
+import { getStoredUser } from '@/lib/client-auth';
 
 /**
  * WarehouseDashboard - Дашборд для складу
@@ -16,11 +17,6 @@ import ArchiveOrders from '../orders/ArchiveOrders';
  */
 const WarehouseDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders');
-
-  // Получение ID текущего пользователя
-  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const userId = user?.id;
 
   return (
     <div className="space-y-6">
@@ -110,7 +106,7 @@ const WarehouseDashboard = () => {
 
         {activeTab === 'archive' && (
           <div className="bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
-            <ArchiveOrders userId={userId} />
+            <ArchiveOrders />
           </div>
         )}
       </div>
