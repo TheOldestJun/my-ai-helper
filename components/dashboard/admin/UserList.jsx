@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/client-auth';
 
 const availableRoles = [
   { name: 'ADMIN', label: 'Адміністратор' },
@@ -29,7 +30,7 @@ const UserList = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/users');
+      const response = await fetch('/api/users', { headers: getAuthHeaders() });
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       setUsers(data.users);
@@ -48,6 +49,7 @@ const UserList = () => {
     try {
       const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
       if (!response.ok) throw new Error('Failed to delete user');
       toast.success('Користувача успішно видалено');
@@ -63,7 +65,7 @@ const UserList = () => {
     try {
       const response = await fetch(`/api/users/${editingUser.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           email: editingUser.email,
           firstName: editingUser.firstName,
