@@ -108,7 +108,8 @@ export const PATCH = requireAuth(async (request, { params }) => {
       const hasWarehouseRole = userRoles.includes('WAREHOUSE');
 
       // Проверка: снабжение может менять статус только до IN_TRANSIT (ORDERED, PAID, IN_TRANSIT)
-      if (hasSupplyRole && status === 'RECEIVED') {
+      // Если у пользователя есть роль WAREHOUSE - разрешаем RECEIVED
+      if (hasSupplyRole && !hasWarehouseRole && status === 'RECEIVED') {
         return NextResponse.json(
           { error: 'Снабжение може змінювати статус тільки до "В дорозі"' },
           { status: 403 }

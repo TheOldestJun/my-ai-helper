@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   ChevronDown, ChevronRight, HelpCircle, UserCheck, ShoppingCart,
   Warehouse, Building2, UtensilsCrossed, ArrowRight, Archive,
-  Shield, FileText, ArrowLeft, Milk, Calculator, ClipboardList
+  FileText, ArrowLeft, Milk, Calculator, ClipboardList
 } from 'lucide-react';
 
 const sections = [
@@ -15,7 +15,7 @@ const sections = [
     title: 'Про систему',
     content: (
       <div className="space-y-3">
-        <p>My AI Helper — система для автоматизації роботи підприємства. Включає управління заявками на закупівлю (повний цикл: від подання до отримання на складі), оформлення перепусток на ввіз/вивіз, планування меню для кухні, облік молока та розрахунок продуктів.</p>
+        <p>My AI Helper — система для автоматизації роботи підприємства. Включає управління заявками на закупівлю (повний цикл: від подання до отримання на складі й архівації), оформлення перепусток на ввіз/вивіз, планування меню для кухні.</p>
         <p>Кожен користувач може мати одну або кілька ролей. У верхній частині дашборда відображаються кнопки для перемикання між ролями.</p>
       </div>
     ),
@@ -44,7 +44,7 @@ const sections = [
         </div>
         <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
           <h4 className="font-medium text-orange-800 dark:text-orange-200">Кухня (KITCHEN)</h4>
-          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Планує меню на тиждень з цінами страв, веде облік молока, розраховує кількість продуктів на порції.</p>
+          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Планує меню на тиждень з цінами страв та експортом у PDF. Веде облік молока, розраховує кількість продуктів на порції.</p>
         </div>
         <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
           <h4 className="font-medium text-purple-800 dark:text-purple-200">Адміністратор (ADMIN)</h4>
@@ -87,16 +87,16 @@ const sections = [
           </div>
           <div className="flex items-center gap-3 p-2 bg-green-50 dark:bg-green-900/20 rounded">
             <span className="w-3 h-3 rounded-full bg-green-400 shrink-0" />
-            <div><span className="font-medium">Отримано</span><span className="text-sm text-muted-foreground ml-2">— товар прийнято на складі. Статус може змінити тільки склад</span></div>
+            <div><span className="font-medium">Отримано</span><span className="text-sm text-muted-foreground ml-2">— товар прийнято на складі</span></div>
           </div>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
           <Archive className="w-4 h-4" />
-          <span>Коли всі пункти заявки мають статус «Отримано», заявник може заархівувати заявку кнопкою «Архівувати» в списку своїх заявок.</span>
+          <span>Коли всі пункти заявки мають статус «Отримано», на картці заявки з&rsquo;являється зелений банер з прогресом (N/M товарів отримано) та кнопка «Архівувати».</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <ArrowRight className="w-4 h-4" />
-          <span>Снабження може змінювати статуси в прямому та зворотному напрямку (крім «Отримано»). Склад може змінити «В дорозі» → «Отримано».</span>
+          <span>Снабження може змінювати статуси в прямому та зворотному напрямку (крім «Отримано»). Якщо користувач має ролі SUPPLY+WAREHOUSE, він також може встановити «Отримано».</span>
         </div>
       </div>
     ),
@@ -115,7 +115,7 @@ const sections = [
           <li>Вкажіть кількість та одиницю виміру для кожного товару.</li>
           <li>Натисніть <strong>«Створити замовлення»</strong>.</li>
         </ol>
-        <p className="text-sm text-muted-foreground">Після створення заявка з&rsquo;являється у вкладці «Мої заявки» зі статусом «Очікує». Ви можете переглядати статуси, редагувати відхилені пункти, видаляти відхилені заявки. Після отримання всіх товарів натисніть «Архівувати».</p>
+        <p className="text-sm text-muted-foreground">Після створення заявка з&rsquo;являється у вкладці «Мої заявки» зі статусом «Очікує». Ви можете переглядати статуси, редагувати відхилені пункти, видаляти відхилені заявки. Коли всі товари отримано на складі, на картці з&rsquo;явиться зелений банер «N/M товарів отримано» та кнопка <strong>«Архівувати»</strong>.</p>
       </div>
     ),
   },
@@ -131,6 +131,7 @@ const sections = [
           <li>Натисніть <strong>«Погодити»</strong> або <strong>«Відхилити»</strong> на кожному пункті окремо.</li>
           <li>При відхиленні обов&rsquo;язково вкажіть причину в текстовому полі.</li>
           <li>Вкладка <strong>«Огляд заявок»</strong> показує зведену таблицю зі статусами всіх заявок та можливістю розгорнути кожну для перегляду пунктів.</li>
+          <li>Архів містить заархівовані заявки (не старше 3 років).</li>
         </ol>
       </div>
     ),
@@ -141,12 +142,12 @@ const sections = [
     title: 'Як замовити товари (снабження)',
     content: (
       <div className="space-y-3">
-        <p className="text-sm text-muted-foreground">Снабженню доступні вкладки: <strong>«Заявки на закупівлю»</strong>, <strong>«Архів»</strong>, <strong>«Перепустки»</strong>, а також заготовки «Постачальники» та «Договори».</p>
+        <p className="text-sm text-muted-foreground">Снабженню доступні вкладки: <strong>«Заявки на закупівлю»</strong>, <strong>«Постачальники»</strong>, <strong>«Договори»</strong>, <strong>«Архів»</strong>, <strong>«Перепустки»</strong>.</p>
         <ol className="list-decimal list-inside space-y-2 text-sm">
-          <li>На вкладці <strong>«Заявки на закупівлю»</strong> відображаються всі схвалені товари.</li>
+          <li>На вкладці <strong>«Заявки на закупівлю»</strong> відображаються всі схвалені товари, згруповані за заявками.</li>
           <li>Змінюйте статус кожного товару через випадаючий список: Замовлено → Сплачено → В дорозі.</li>
-          <li>Статуси можна змінювати як уперед, так і назад (крім «Отримано» — це прерогатива складу).</li>
-          <li>Вкладка <strong>«Постачальники»</strong> та <strong>«Договори»</strong> — заготовки для майбутніх функцій.</li>
+          <li>Статуси можна змінювати як уперед, так і назад (крім «Отримано» — це прерогатива складу). Якщо у вас є ролі SUPPLY+WAREHOUSE, вам також доступний статус «Отримано».</li>
+          <li>Вкладки <strong>«Постачальники»</strong> та <strong>«Договори»</strong> — заготовки для майбутніх функцій.</li>
         </ol>
       </div>
     ),
@@ -215,35 +216,7 @@ const sections = [
       </div>
     ),
   },
-  {
-    id: 'admin',
-    icon: Shield,
-    title: 'Адміністрування (керування користувачами)',
-    content: (
-      <div className="space-y-3">
-        <p className="text-sm text-muted-foreground">Адміністратору доступні вкладки: <strong>«Користувачі»</strong>, а також заготовки «Налаштування» та «Логи».</p>
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-medium mb-1">Створення користувача</h4>
-            <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Перейдіть на вкладку <strong>«Користувачі» → «Створити»</strong>.</li>
-              <li>Заповніть поля: email, пароль, ім&rsquo;я та оберіть одну або кілька ролей.</li>
-              <li>Натисніть <strong>«Створити користувача»</strong>.</li>
-            </ol>
-          </div>
-          <div>
-            <h4 className="font-medium mb-1">Редагування та видалення</h4>
-            <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Перейдіть на вкладку <strong>«Користувачі» → «Список»</strong>.</li>
-              <li>В таблиці відображаються всі зареєстровані користувачі.</li>
-              <li>Натисніть «Редагувати» для зміни email, імені, ролей або пароля.</li>
-              <li>Натисніть «Видалити» для видалення користувача.</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    ),
-  },
+
 ];
 
 const Section = ({ section, isOpen, onToggle }) => {

@@ -26,7 +26,7 @@ export const GET = requireAuth(async (request) => {
 
     let filterArchived = true;
     const hasSupplyRole = userRoleNames.includes('SUPPLY');
-    if (hasSupplyRole) {
+    if (hasSupplyRole && !isApplicant) {
       filterArchived = false;
     }
 

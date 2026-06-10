@@ -31,8 +31,16 @@ npm run dev
 
 - **MySQL** через Prisma ORM
 - Схема: `prisma/schema.prisma`
-- Сиды: `prisma/seed.js` (пользователи), `prisma/seed-dishes.js` (блюда для кухни)
 - Миграции: `npx prisma migrate dev` (создать и применить)
+- Сброс БД: `npx prisma migrate reset --force` (удалить все таблицы, применить миграции, запустить сиды)
+- **Сиды запускать строго в порядке:**
+  ```bash
+  node prisma/seed-roles.js
+  node prisma/seed-users.js
+  node prisma/seed-units.js
+  node prisma/seed-products.js
+  node prisma/seed-dishes.js
+  ```
 
 # Архитектура проекта
 

@@ -25,7 +25,7 @@ export const GET = requireRole('SUPPLY', 'DIRECTORATE', 'WAREHOUSE', 'APPLICANT'
             not: null,
             gte: threeYearsAgo,
           },
-          ...(isApplicant ? { createdById: userId } : {}),
+          ...(isApplicant ? { createdById: user.id } : {}),
         },
         include: {
           createdBy: {
@@ -94,7 +94,7 @@ export const GET = requireRole('SUPPLY', 'DIRECTORATE', 'WAREHOUSE', 'APPLICANT'
             not: null,
             gte: threeYearsAgo,
           },
-          ...(isApplicant ? { createdById: userId } : {}),
+          ...(isApplicant ? { createdById: user.id } : {}),
         },
       }),
     ]);

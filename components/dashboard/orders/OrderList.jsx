@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ShoppingCart, CreditCard, Truck, CircleCheck, X, Archive, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -248,16 +248,36 @@ const OrderList = ({ showActions = false, allowEdit = false }) => {
             </div>
           )}
 
-          {allowEdit && order.products && order.products.length > 0 && order.products.every(item => item.status === 'RECEIVED') && !order.archivedAt && (
-            <div className="mb-3">
-              <button
-                onClick={() => handleArchiveOrder(order.id)}
-                className="text-sm text-primary hover:text-primary/80 font-medium"
-                onMouseEnter={(e) => handleTooltip(e, 'Архівувати заявку')}
-                onMouseLeave={hideTooltip}
-              >
-                Архівувати заявку
-              </button>
+          {allowEdit && order.products && order.products.length > 0 && !order.archivedAt && (
+            <div className={`mb-3 rounded-lg border p-3 ${order.products.every(item => item.status === 'RECEIVED') ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-muted/30 border-border'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {order.products.every(item => item.status === 'RECEIVED') ? (
+                    <CircleCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <Package className="w-5 h-5 text-muted-foreground" />
+                  )}
+                  <div>
+                    <span className="text-sm font-medium text-foreground">
+                      {order.products.filter(p => p.status === 'RECEIVED').length}/{order.products.length} товарів отримано
+                    </span>
+                    {order.products.every(item => item.status === 'RECEIVED') && (
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                        ✅ Усі товари отримані — заявку можна архівувати
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {order.products.every(item => item.status === 'RECEIVED') && (
+                  <button
+                    onClick={() => handleArchiveOrder(order.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                  >
+                    <Archive className="w-4 h-4" />
+                    Архівувати
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
